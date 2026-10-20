@@ -54,3 +54,39 @@ article .pathogen-table strong{color:#254d43}
 article .pathogen-table tr:nth-child(even){background:#f6f8f1}
 article .pathogen-table tr:nth-child(odd){background:#fffdf7}
 @media(max-width:600px){article .pathogen-table{min-width:680px}.pathogen-wrap{border-radius:7px}}
+
+/* Source-PDF tables: readable type, original column proportions and group rows. */
+.pdf-table-block{margin:30px 0 38px;min-width:0}
+.pdf-table-block>h3{border-left:5px solid #bea13b;padding:4px 0 4px 13px;color:#18324f;line-height:1.6}
+.pdf-table-block .source-note{margin:6px 0;color:#697581}
+.table-scroll-hint{font-size:12px;color:#74816f;margin:5px 0}
+.pdf-table-wrap{border-color:#d7dfe6;background:#fff;border-radius:7px;overscroll-behavior-x:contain}
+.pdf-table-wrap:focus-visible{outline:3px solid #b48b48;outline-offset:3px}
+article .pdf-table{table-layout:fixed;min-width:840px;font-size:15px;line-height:1.85;color:#263d52}
+article .pdf-table.wide-pdf-table{min-width:1100px}
+article .pdf-table.spectrum-table{min-width:1500px;font-size:15px;line-height:1.7}
+article .pdf-table th,article .pdf-table td{padding:12px 10px;border:1px solid #dce3e9;vertical-align:top;overflow-wrap:anywhere;min-width:0;color:#34495e;font-weight:700}
+article .pdf-table thead th{background:#162e4c;color:#fff;vertical-align:middle;font-weight:900}
+article .pdf-table tbody th{background:#f0f4f8;color:#18324f;font-weight:900;text-align:left}
+article .pdf-table tbody tr{background:#fff}
+article .pdf-table tbody tr:nth-child(even){background:#f4f6f9}
+article .pdf-table .pdf-group th{background:#e4eaf3;color:#152f4d;letter-spacing:.5px;padding:9px 12px}
+article .pdf-table td:first-child{font-weight:700;min-width:0}
+article .spectrum-table .spectrum-cell{text-align:center;vertical-align:middle;font-weight:900}
+article .pdf-table .spectrum-positive{color:#20734b}
+article .pdf-table .spectrum-negative{color:#8c5e58}
+article .pdf-table .spectrum-variable{color:#927018}
+.pdf-table-wrap:has(.spectrum-table){max-height:75vh;overflow:auto}
+article .spectrum-table thead th{position:sticky;top:0;z-index:2}
+article .spectrum-table tbody th:first-child{position:sticky;left:0;z-index:1;background:#edf2f7;box-shadow:2px 0 0 #ced8e2}
+article .spectrum-table thead th:first-child{left:0;z-index:3}
+.correction-mark{color:#a05b2d;font-size:.8em;margin-left:3px}
+.table-footnote{font-size:13px;line-height:1.8;color:#776a50}
+.study-summary{border:1px solid #d8dfd0;border-radius:8px;margin:24px 0;background:#f4f5eb}
+.study-summary>summary{padding:14px 17px;cursor:pointer;font-size:16px;list-style:none}
+.study-summary>summary::-webkit-details-marker{display:none}
+.study-summary>summary::after{content:'＋';float:right}
+.study-summary[open]>summary::after{content:'－'}
+.study-summary>summary:focus-visible{outline:3px solid #b48b48;outline-offset:2px}
+.study-summary-content{padding:5px 18px 20px;border-top:1px solid #d8dfd0;min-width:0}
+@media(max-width:600px){.pdf-table-block{margin:24px 0 30px}article .pdf-table{font-size:15px;min-width:780px}.pdf-table-block>h3{font-size:19px}.study-summary-content{padding:4px 12px 16px}.table-scroll-hint{font-size:12px}.pdf-table-wrap:has(.spectrum-table){max-height:70vh}}
