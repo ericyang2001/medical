@@ -1,5 +1,5 @@
 window.MEDICAL_LIBRARY={
-  "updated": "2026-10-20T12:11:16+08:00",
+  "updated": "2026-10-20T12:22:03+08:00",
   "books": [
     {
       "id": "welcome",
@@ -187,7 +187,7 @@ window.MEDICAL_LIBRARY={
         {
           "id": "formulas",
           "title": "13 公式速查",
-          "html": "<p class=\"source-note\">原手冊 pp. 19</p><div class=\"table-wrap\" tabindex=\"0\"><table><thead><tr><th>公式</th><th>單位與限制</th></tr></thead><tbody><tr><td>ANC = WBC × (Seg% + Band%) ÷100</td><td>WBC 與 ANC：/µL</td></tr><tr><td>Corrected Ca = Ca + 0.8 × (4 − Albumin)</td><td>Ca：mg/dL；albumin：g/dL。重症優先測 iCa。</td></tr><tr><td>Corrected Na ≈ Na + 1.6 × (Glucose −100) ÷100</td><td>Na：mmol/L；glucose：mg/dL。係數為近似值，嚴重高血糖時可有偏差。</td></tr><tr><td>自由水缺乏量 = TBW × (Na/140 −1)</td><td>TBW 以 L 計；手冊估體重 ×0.6（男）／0.5（女），年齡與體組成會改變估值，尚需計入持續流失。</td></tr><tr><td>Na deficit = TBW × (目標 Na −現有 Na)</td><td>估計值，不是直接輸液處方；3% NaCl 約含 513 mEq/L Na。</td></tr><tr><td>AG = Na − (Cl + HCO₃⁻)</td><td>常見正常值約 8–12 mmol/L，依實驗室而異。</td></tr><tr><td>Corrected AG = AG + 2.5 × (4 −Albumin)</td><td>Albumin：g/dL</td></tr><tr><td>Winter：預期 PaCO₂ = 1.5 × HCO₃⁻ +8 ±2</td><td>PaCO₂：mmHg；用於代謝性酸中毒。</td></tr><tr><td>估計 Osm = 2 × Na + Glucose/18 + BUN/2.8</td><td>Glucose、BUN：mg/dL；估計結果約 mOsm/kg。</td></tr><tr><td>FENa = (U_Na × P_Cr)/(P_Na × U_Cr) ×100%</td><td>尿與血的相同分析物須使用一致單位；&lt;1% 是線索，不是確診。</td></tr><tr><td>FEUrea = (U_urea × P_Cr)/(P_urea × U_Cr) ×100%</td><td>尿血 urea 或尿血 urea nitrogen 須一致，不可混用。&lt;35% 僅輔助。</td></tr><tr><td>BUN/Cr = BUN ÷ Creatinine</td><td>兩者用 mg/dL；&gt;20 可支持腎前性，也受其他因素影響。</td></tr><tr><td>年齡校正 D-dimer = 年齡 ×10 µg/L FEU</td><td>限 &gt;50 歲與適當臨床機率／驗證流程。</td></tr></tbody></table></div>"
+          "html": "<div id=\"lab-calculator\" class=\"lab-calculator\"></div><p class=\"source-note\">原手冊 pp. 19</p><div class=\"table-wrap\" tabindex=\"0\"><table><thead><tr><th>公式</th><th>單位與限制</th></tr></thead><tbody><tr><td>ANC = WBC × (Seg% + Band%) ÷100</td><td>WBC 與 ANC：/µL</td></tr><tr><td>Corrected Ca = Ca + 0.8 × (4 − Albumin)</td><td>Ca：mg/dL；albumin：g/dL。重症優先測 iCa。</td></tr><tr><td>Corrected Na ≈ Na + 1.6 × (Glucose −100) ÷100</td><td>Na：mmol/L；glucose：mg/dL。係數為近似值，嚴重高血糖時可有偏差。</td></tr><tr><td>自由水缺乏量 = TBW × (Na/140 −1)</td><td>TBW 以 L 計；手冊估體重 ×0.6（男）／0.5（女），年齡與體組成會改變估值，尚需計入持續流失。</td></tr><tr><td>Na deficit = TBW × (目標 Na −現有 Na)</td><td>估計值，不是直接輸液處方；3% NaCl 約含 513 mEq/L Na。</td></tr><tr><td>AG = Na − (Cl + HCO₃⁻)</td><td>常見正常值約 8–12 mmol/L，依實驗室而異。</td></tr><tr><td>Corrected AG = AG + 2.5 × (4 −Albumin)</td><td>Albumin：g/dL</td></tr><tr><td>Winter：預期 PaCO₂ = 1.5 × HCO₃⁻ +8 ±2</td><td>PaCO₂：mmHg；用於代謝性酸中毒。</td></tr><tr><td>估計 Osm = 2 × Na + Glucose/18 + BUN/2.8</td><td>Glucose、BUN：mg/dL；估計結果約 mOsm/kg。</td></tr><tr><td>FENa = (U_Na × P_Cr)/(P_Na × U_Cr) ×100%</td><td>尿與血的相同分析物須使用一致單位；&lt;1% 是線索，不是確診。</td></tr><tr><td>FEUrea = (U_urea × P_Cr)/(P_urea × U_Cr) ×100%</td><td>尿血 urea 或尿血 urea nitrogen 須一致，不可混用。&lt;35% 僅輔助。</td></tr><tr><td>BUN/Cr = BUN ÷ Creatinine</td><td>兩者用 mg/dL；&gt;20 可支持腎前性，也受其他因素影響。</td></tr><tr><td>年齡校正 D-dimer = 年齡 ×10 µg/L FEU</td><td>限 &gt;50 歲與適當臨床機率／驗證流程。</td></tr></tbody></table></div>"
         },
         {
           "id": "references",
