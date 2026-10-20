@@ -147,3 +147,12 @@ article table.abx-table .spectrum-variable{color:#927018}
 .library-card:active .card-enter{transform:scale(.97)}
 @media(prefers-reduced-transparency:reduce){.library-card .card-enter{background:#f5f7f2;backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media(prefers-reduced-motion:reduce){.library-card .card-enter{transition:none}.library-card:active .card-enter{transform:none}}
+
+/* Muted slate-blue palette for the ACLS borrowing card. */
+.resource-link.library-card:nth-child(3){background:#e9eef0;border-color:#b6c5c9;color:#36535b;box-shadow:0 4px 0 #cdd9dc,0 8px 18px #354c550b}
+.library-card:nth-child(3) .card-top{background:#526f79;color:#f7f5ed}
+.library-card:nth-child(3) .card-kicker,.library-card:nth-child(3) .card-rule>span{color:#65777b}
+.library-card:nth-child(3) .card-rule{border-color:#bccbd166}
+.library-card:nth-child(3) .card-bottom{border-color:#a9bbc2}
+.library-card:nth-child(3) .card-enter{color:#36535b}
+.library-card:nth-child(3):hover{box-shadow:0 4px 0 #cdd9dc,0 12px 22px #354c5518}
