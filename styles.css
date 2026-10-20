@@ -104,3 +104,26 @@ article table.abx-table strong{color:#18324f}
 article table.abx-table .spectrum-positive{color:#20734b}
 article table.abx-table .spectrum-negative{color:#8c5e58}
 article table.abx-table .spectrum-variable{color:#927018}
+
+/* Compact borrowing cards: four slots on tablet/desktop, two on phones. */
+.resource-links{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+.resource-link.library-card{min-width:0;border-radius:9px}
+.library-card .card-top{padding:9px 12px;gap:4px 8px;flex-wrap:wrap;font-size:10px;letter-spacing:0;line-height:1.6}
+.library-card .card-id{font-size:9px}
+.resource-link.library-card>.card-body{padding:14px 12px 10px;flex:1}
+.library-card .card-kicker{font-size:8px;letter-spacing:1px;margin-bottom:9px}
+.resource-link.library-card strong{font-size:18px;line-height:1.5;letter-spacing:0;margin:0 0 12px;min-height:3em;overflow-wrap:anywhere}
+.library-card .card-rule{display:block;padding:7px 0;font-size:13px;line-height:1.65}
+.library-card .card-rule>span{display:block;font-size:10px;margin-bottom:2px}
+.library-card .card-rule b{display:block;overflow-wrap:anywhere}
+.library-card .card-bottom{margin:0 12px;padding:10px 0 12px;gap:7px;flex-wrap:wrap}
+.library-card .card-barcode{width:46px;height:18px}
+.library-card .card-enter{font-size:10px;white-space:normal}
+.library-card .card-enter>span{font-size:13px;margin-left:3px}
+@media(max-width:767px){
+ .resource-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .resource-link.library-card strong{font-size:16px}
+ .library-card .card-top{padding:8px 10px}
+ .resource-link.library-card>.card-body{padding:12px 10px 8px}
+ .library-card .card-bottom{margin:0 10px}
+}
