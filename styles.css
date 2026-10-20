@@ -166,3 +166,6 @@ header nav{align-items:center}
 @media(max-width:600px){header nav{gap:10px}.refresh-page{border-radius:13px}}
 @media(prefers-reduced-transparency:reduce){.refresh-page{background:#f5f7f2;backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media(prefers-reduced-motion:reduce){.refresh-page{transition:none}.refresh-page:active{transform:none}}
+
+/* Circular refresh control on all screen sizes. */
+header nav .refresh-page{border-radius:50%}
