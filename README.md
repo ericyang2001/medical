@@ -12,7 +12,7 @@ Eric Yang 的個人醫學學習書房。圓潤粗體、木質書架、響應式�
 ## 新增教材
 在 ChatGPT 上傳教材並要求整理及更新本儲存庫。編輯 catalog.js 的 books 陣列：每本書使用唯一 id，包含 title、subtitle、category、color、tags、sections。section 包含唯一 id、title、html。html 僅限人工審閱的可信內容，不可直接插入訪客輸入。原始檔可放 assets/ 並以相對路徑連結。
 
-網站本身不提供檔案上傳或 AI 整理服務。初始三本書為使用指南，未包含醫學教材。此儲存庫及網站為公開，僅供個人學習使用。
+網站本身不提供檔案上傳或 AI 整理服務。首頁直接呈現書架；三篇使用指南僅從右上角進入，不列入館藏。尚未包含醫學教材。此儲存庫及網站為公開，僅供個人學習使用。
 
 ## 更新日期
 頁尾使用 GitHub 最新 main 提交時間，顯示 Asia/Taipei 日期。API 不可用時退回 catalog.js 的 updated；每次內容更新也應同步該值。不使用造訪日期冒充更新日期。
