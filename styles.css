@@ -3,3 +3,5 @@
 
 /* Bookshelf-first homepage and separate guide navigation. */
 .collection{border-top:0;padding-top:38px}.empty-shelf{grid-column:1/-1;display:grid!important;min-height:224px}.guide-links{display:flex;flex-wrap:wrap;gap:20px;border-top:1px solid var(--line);margin-top:35px;padding-top:22px;font-size:13px}
+
+.section-top{margin-bottom:25px}
