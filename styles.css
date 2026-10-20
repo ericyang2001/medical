@@ -156,3 +156,13 @@ article table.abx-table .spectrum-variable{color:#927018}
 .library-card:nth-child(3) .card-bottom{border-color:#a9bbc2}
 .library-card:nth-child(3) .card-enter{color:#36535b}
 .library-card:nth-child(3):hover{box-shadow:0 4px 0 #cdd9dc,0 12px 22px #354c5518}
+
+/* Translucent refresh control beside the guide. */
+header nav{align-items:center}
+.refresh-page{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.82);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.65),rgba(255,255,255,.2));color:var(--ink);cursor:pointer;-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);box-shadow:inset 0 1px 0 #ffffffbf,0 3px 12px #254d4310;transition:background .18s,transform .18s}
+.refresh-page:hover{background:rgba(255,255,255,.75)}
+.refresh-page:active{transform:scale(.94)}
+.refresh-page:focus-visible{outline:3px solid #b48b48;outline-offset:3px}
+@media(max-width:600px){header nav{gap:10px}.refresh-page{border-radius:13px}}
+@media(prefers-reduced-transparency:reduce){.refresh-page{background:#f5f7f2;backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){.refresh-page{transition:none}.refresh-page:active{transform:none}}

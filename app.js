@@ -16,3 +16,6 @@ showDate(data.updated);
 // Public repository metadata only. If offline/rate-limited, keep the bundled content date.
 fetch('https://api.github.com/repos/ericyang2001/medical/commits?sha=main&per_page=1',{headers:{Accept:'application/vnd.github+json'}}).then(r=>{if(!r.ok)throw Error('Date unavailable');return r.json()}).then(commits=>{const date=commits?.[0]?.commit?.committer?.date;if(date)showDate(date)}).catch(()=>{});
 renderBooks();route();
+
+// Reload the current page, preserving its route.
+document.getElementById("refresh-page")?.addEventListener("click", () => window.location.reload());
