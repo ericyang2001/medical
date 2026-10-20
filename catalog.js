@@ -1,5 +1,5 @@
 window.MEDICAL_LIBRARY={
-  "updated": "2026-10-20T12:22:03+08:00",
+  "updated": "2026-10-20T12:28:44+08:00",
   "books": [
     {
       "id": "welcome",
@@ -117,7 +117,7 @@ window.MEDICAL_LIBRARY={
         {
           "id": "cbc",
           "title": "01 血液常規與白血球分類",
-          "html": "<p class=\"source-note\">原手冊 pp. 3–4</p><div class=\"table-wrap\" tabindex=\"0\"><table><thead><tr><th>項目／常見區間</th><th>判讀方向</th><th>重點提醒</th></tr></thead><tbody><tr><td>WBC：4,000–10,000 /µL</td><td>升高：感染、壓力、類固醇、抽菸、脫水；降低：藥物、病毒、骨髓或免疫問題。</td><td>同看 differential count 與絕對數；極高值或 blast 應評估血液疾病。</td></tr><tr><td>ANC：1,500–8,000 /µL</td><td>1,000–1,500 輕度；500–1,000 中度；&lt;500 重度；&lt;100 極重度。</td><td>ANC = WBC × (Seg% + Band%) ÷ 100。WBC 2,000、Seg 30%、Band 5% → ANC 700 /µL。</td></tr><tr><td>Seg／Band</td><td>中性球增加與左移可見於感染或壓力。</td><td>百分比受其他細胞數影響，不能取代 ANC。</td></tr><tr><td>Hb：男 13.5–17.5；女 12.0–15.5 g/dL</td><td>貧血先看 MCV、reticulocyte、出血與溶血線索。</td><td>輸血須考慮循環、症狀、失血及共病。穩定成人常採 Hb &lt;7 g/dL 的限制性策略；心血管情境另議。</td></tr><tr><td>PLT：150–400 ×10³/µL</td><td>升高先找感染、缺鐵、術後或慢性發炎；降低需查藥物、消耗、骨髓與脾臟因素。</td><td>手冊列化療／異體移植無出血 &lt;10k、大型非神經軸手術 &lt;50k、腰椎穿刺 &lt;20k 等輸注情境；不可當成所有病人的通則。</td></tr><tr><td>NLR／PLR</td><td>NLR = ANC ÷ 絕對淋巴球數；PLR = 血小板數 ÷ 絕對淋巴球數。</td><td>僅為輔助發炎訊號，受壓力與類固醇影響，無法單獨診斷感染。</td></tr></tbody></table></div><div class=\"clinical-note\"><strong>校核補充：</strong>WBC &lt;1,000 並不直接等於發燒性嗜中性球低下（FN）。應看 ANC；癌症相關常用定義為 ANC &lt;500 /µL，或預期 48 小時內降至此值，合併單次口溫 ≥38.3°C，或 ≥38.0°C 持續一小時。疑似 FN 需緊急評估與及時經驗性抗感染治療。見頁末校核來源 C1。</div>"
+          "html": "<p class=\"source-note\">原手冊 pp. 3–4</p><div class=\"table-wrap\" tabindex=\"0\"><table class=\"cbc-table\"><thead><tr><th>項目</th><th>常見區間</th><th>判讀方向</th><th>重點提醒</th></tr></thead><tbody><tr><td>WBC</td><td>4,000–10,000 /µL</td><td>升高：感染、壓力、類固醇、抽菸、脫水；降低：藥物、病毒、骨髓或免疫問題。</td><td>同看 differential count 與絕對數；極高值或 blast 應評估血液疾病。</td></tr><tr><td>ANC</td><td>1,500–8,000 /µL</td><td>1,000–1,500 輕度；500–1,000 中度；&lt;500 重度；&lt;100 極重度。</td><td>ANC = WBC × (Seg% + Band%) ÷ 100。WBC 2,000、Seg 30%、Band 5% → ANC 700 /µL。</td></tr><tr><td>Seg／Band</td><td>Seg：40–75%<br>Band：0–5%</td><td>中性球增加與左移可見於感染或壓力。</td><td>百分比受其他細胞數影響，不能取代 ANC。</td></tr><tr><td>Hb</td><td>男：13.5–17.5 g/dL<br>女：12.0–15.5 g/dL</td><td>貧血先看 MCV、reticulocyte、出血與溶血線索。</td><td>輸血須考慮循環、症狀、失血及共病。穩定成人常採 Hb &lt;7 g/dL 的限制性策略；心血管情境另議。</td></tr><tr><td>PLT</td><td>150–400 ×10³/µL</td><td>升高先找感染、缺鐵、術後或慢性發炎；降低需查藥物、消耗、骨髓與脾臟因素。</td><td>手冊列化療／異體移植無出血 &lt;10k、大型非神經軸手術 &lt;50k、腰椎穿刺 &lt;20k 等輸注情境；不可當成所有病人的通則。</td></tr><tr><td>NLR／PLR</td><td>NLR：約 1–3<br>PLR：原手冊未列正常區間</td><td>NLR = ANC ÷ 絕對淋巴球數；PLR = 血小板數 ÷ 絕對淋巴球數。</td><td>僅為輔助發炎訊號，受壓力與類固醇影響，無法單獨診斷感染。</td></tr></tbody></table></div><div class=\"clinical-note\"><strong>校核補充：</strong>WBC &lt;1,000 並不直接等於發燒性嗜中性球低下（FN）。應看 ANC；癌症相關常用定義為 ANC &lt;500 /µL，或預期 48 小時內降至此值，合併單次口溫 ≥38.3°C，或 ≥38.0°C 持續一小時。疑似 FN 需緊急評估與及時經驗性抗感染治療。見頁末校核來源 C1。</div>"
         },
         {
           "id": "liver",
