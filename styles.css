@@ -40,3 +40,17 @@ article{font-size:17px}article table{font-size:15px}article h2{font-size:24px}ar
 /* Native mobile chapter picker; retain desktop chapter links. */
 .mobile-toc{display:none}
 @media(max-width:600px){#toc{display:none}.mobile-toc{display:block;margin-top:20px}.mobile-toc label{display:block;font-size:14px;margin-bottom:8px;color:var(--ink)}.mobile-toc select{display:block;width:100%;max-width:100%;padding:12px;border:1px solid #b8c5af;border-radius:8px;background:#fffdf7;color:var(--ink);font:inherit;font-size:16px;min-height:48px}.mobile-toc select:focus-visible{outline:3px solid #b48b48;outline-offset:3px}}
+
+/* PDF-style grouped pathogen map. */
+article .pathogen-table{table-layout:fixed;min-width:720px}
+.pathogen-table .kind-col{width:13%}.pathogen-table .genus-col{width:24%}
+article .pathogen-table thead th{background:#254d43;color:#fffdf7;border-color:#254d43}
+article .pathogen-table .pathogen-group th{background:#dfe8dc;color:#254d43;padding:10px 12px;border-top:1px solid #bdccba;letter-spacing:.4px}
+article .pathogen-table td,article .pathogen-table .pathogen-kind{border:1px solid #d0dacb;padding:12px;vertical-align:top}
+article .pathogen-table .pathogen-kind{background:#edf1e8;font-size:14px;overflow-wrap:anywhere}
+.pathogen-kind span{font-size:13px;font-weight:700}
+article .pathogen-table td:first-of-type{font-weight:700}
+article .pathogen-table strong{color:#254d43}
+article .pathogen-table tr:nth-child(even){background:#f6f8f1}
+article .pathogen-table tr:nth-child(odd){background:#fffdf7}
+@media(max-width:600px){article .pathogen-table{min-width:680px}.pathogen-wrap{border-radius:7px}}
