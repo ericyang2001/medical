@@ -127,3 +127,23 @@ article table.abx-table .spectrum-variable{color:#927018}
  .resource-link.library-card>.card-body{padding:12px 10px 8px}
  .library-card .card-bottom{margin:0 10px}
 }
+
+/* Frosted iOS-style website entry buttons within the card links. */
+.library-card .card-bottom{display:grid;grid-template-columns:1fr;gap:10px}
+.library-card .card-barcode{width:58px;height:14px;opacity:.4}
+.library-card .card-enter{
+ display:flex;align-items:center;justify-content:center;min-height:44px;width:100%;
+ padding:9px 10px;border:1px solid rgba(255,255,255,.8);border-radius:14px;
+ background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(255,255,255,.28));
+ color:#254d43;font-size:13px;font-weight:900;line-height:1.4;white-space:nowrap;
+ -webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 3px 10px rgba(37,77,67,.1);
+ transition:background .18s,box-shadow .18s,transform .18s;
+}
+.library-card:hover .card-enter,.library-card:focus-visible .card-enter{
+ background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(255,255,255,.5));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 4px 12px rgba(37,77,67,.16);
+}
+.library-card:active .card-enter{transform:scale(.97)}
+@media(prefers-reduced-transparency:reduce){.library-card .card-enter{background:#f5f7f2;backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){.library-card .card-enter{transition:none}.library-card:active .card-enter{transform:none}}
