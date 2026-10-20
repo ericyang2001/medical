@@ -1,5 +1,5 @@
 window.MEDICAL_LIBRARY = {
-  "updated": "2026-10-20T21:19:00+08:00",
+  "updated": "2026-10-20T21:22:00+08:00",
   "books": [
     {
       "id": "welcome",
@@ -189,7 +189,7 @@ window.MEDICAL_LIBRARY = {
     {
       "id": "antibiotics-primer",
       "title": "抗生素入門",
-      "subtitle": "Antibiotics",
+      "subtitle": "ANTIBIOTICS",
       "category": "臨床用藥",
       "color": "#ae8057",
       "tags": [
