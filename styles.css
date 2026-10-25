@@ -169,3 +169,19 @@ header nav{align-items:center}
 
 /* Circular refresh control on all screen sizes. */
 header nav .refresh-page{border-radius:50%}
+
+/* Laboratory handbook tables, retaining the source content and grouping. */
+article .lab-source-table{table-layout:fixed;min-width:820px;font-size:15px;line-height:1.9}
+article .lab-source-table th,article .lab-source-table td{padding:13px 12px;vertical-align:top;border:1px solid #d0dacb;overflow-wrap:anywhere;min-width:0}
+article .lab-source-table thead th{background:#254d43;color:#fffdf7;font-weight:900}
+article .lab-source-table tbody th{background:#edf1e8;color:#254d43;text-align:left;font-weight:900}
+article .lab-source-table tbody td{color:#52634f;font-weight:700}
+article .lab-source-table .reference-range{background:#f4f6ed;color:#254d43}
+article .lab-source-table tbody tr:nth-child(odd){background:#fffdf7}
+article .lab-source-table tbody tr:nth-child(even){background:#f7f8f1}
+article .source-bullets{padding-left:20px;margin:0}
+article .source-bullets li{margin:0 0 7px;color:inherit}
+article .source-bullets li:last-child{margin-bottom:0}
+.source-new{display:inline-block;background:#ead58c;color:#57461b;padding:0 4px;margin-left:4px;border-radius:3px;font:bold 10px/1.7 sans-serif;vertical-align:middle}
+.lab-source-wrap:focus-visible{outline:3px solid #b48b48;outline-offset:3px}
+@media(max-width:600px){article .lab-source-table{font-size:15px;min-width:780px}}
