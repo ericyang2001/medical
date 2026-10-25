@@ -185,3 +185,13 @@ article .source-bullets li:last-child{margin-bottom:0}
 .source-new{display:inline-block;background:#ead58c;color:#57461b;padding:0 4px;margin-left:4px;border-radius:3px;font:bold 10px/1.7 sans-serif;vertical-align:middle}
 .lab-source-wrap:focus-visible{outline:3px solid #b48b48;outline-offset:3px}
 @media(max-width:600px){article .lab-source-table{font-size:15px;min-width:780px}}
+
+/* Original PDF emphasis, limited to lab interpretation cells. */
+article .lab-source-table td .pdf-bold-highlight {
+  color: inherit;
+  font-weight: 800;
+  background: linear-gradient(transparent 18%, rgba(250, 220, 90, .48) 18%, rgba(250, 220, 90, .48) 94%, transparent 94%);
+  padding: 0 .04em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
