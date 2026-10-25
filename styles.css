@@ -195,3 +195,18 @@ article .lab-source-table td .pdf-bold-highlight {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
+
+/* Full-text search results and in-reader matches. */
+.search-results{margin:20px 0 28px}
+#search-status{color:#52634f;font-weight:800}
+#search-result-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.search-result{display:block;padding:18px 20px;background:#fffdf7;border:1px solid #d0dacb;border-radius:14px;color:#254d43;text-decoration:none;overflow-wrap:anywhere}
+.search-result:hover{background:#f3f4e9;border-color:#70866b}
+.search-result:focus-visible{outline:3px solid #b48b48;outline-offset:3px}
+.search-result-book{display:block;font-size:13px;color:#66745c;margin-bottom:5px}
+.search-result strong{font-size:18px}
+.search-result p{font-size:15px;line-height:1.7;margin:8px 0;color:#495449}
+.search-result-go{font-size:13px;font-weight:800}
+.search-result mark,article .search-hit{background:#f8df88;color:inherit;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+article .search-hit:focus{outline:2px solid #b48b48;outline-offset:3px}
+@media(max-width:600px){.search-result{padding:14px}.search-result strong{font-size:17px}}
