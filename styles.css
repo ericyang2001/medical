@@ -210,3 +210,13 @@ article .lab-source-table td .pdf-bold-highlight {
 .search-result mark,article .search-hit{background:#f8df88;color:inherit;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 article .search-hit:focus{outline:2px solid #b48b48;outline-offset:3px}
 @media(max-width:600px){.search-result{padding:14px}.search-result strong{font-size:17px}}
+
+/* Drug adverse-effects handbook: source tables, callouts and original bold text. */
+.drug-source-wrap{width:100%;overflow-x:auto;margin:18px 0 26px;border:1px solid #d0dacb;border-radius:9px;-webkit-overflow-scrolling:touch}
+article .drug-source-table{min-width:740px}
+.drug-source-content h3.drug-question{margin:38px 0 20px;padding:12px 15px;background:#e8ecdf;border-left:4px solid #68758a;border-radius:0 7px 7px 0}
+.drug-source-content h4{font-size:18px;line-height:1.7;margin:26px 0 12px}
+.drug-source-content .drug-callout-label{color:#85682f;font-size:14px;font-weight:900;letter-spacing:1px;margin:18px 0 0;padding:12px 18px 0;background:#f4efdf;border-left:3px solid #b48b48}
+.drug-source-content .drug-callout-label+p{margin:0 0 20px;padding:10px 18px 16px;background:#f4efdf;border-left:3px solid #b48b48;border-radius:0 0 8px 0}
+article .drug-source-content mark.pdf-bold-highlight{color:inherit;font-weight:900;background:linear-gradient(transparent 18%,rgba(250,220,90,.48) 18%,rgba(250,220,90,.48) 94%,transparent 94%);padding:0 .04em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+@media(max-width:600px){article .drug-source-table{min-width:720px;font-size:15px}.drug-source-content h4{font-size:17px}}
