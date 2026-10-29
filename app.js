@@ -69,9 +69,9 @@ renderBooks();route();
 document.getElementById("refresh-page")?.addEventListener("click", () => window.location.reload());
 
 
-// Shared public page-view counter: one request per full production page load.
-// Hash navigation stays within the same page and does not record extra views.
-(function initViewCounter() {
+// Shared page-view counter. Suppress repeat loads until five minutes of inactivity.
+// Reserve the visit before the request: a slow response must not cause double counting.
+(async function initViewCounter() {
  const count = document.getElementById('busuanzi_value_site_pv');
  const unit = document.getElementById('visit-counter-unit');
  if (!count || !unit) return;
@@ -79,10 +79,57 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
   count.textContent = '預覽不計數';
   return;
  }
+ const key = 'medical-bookshelf:page-view:v1';
+ const cooldown = 5 * 60 * 1000;
+ let storage;
+ for (const name of ['localStorage', 'sessionStorage']) {
+  try {
+   const candidate = window[name];
+   candidate.setItem(key + ':probe', '1');
+   candidate.removeItem(key + ':probe');
+   storage = candidate;
+   break;
+  } catch {}
+ }
+ function read() {
+  try { return JSON.parse(storage?.getItem(key) || '{}') || {}; }
+  catch { return {}; }
+ }
+ function write(value) {
+  try { storage?.setItem(key, JSON.stringify(value)); } catch {}
+ }
+ function claimVisit() {
+  const previous = read();
+  const now = Date.now();
+  const elapsed = now - Number(previous.lastVisit);
+  const repeated = Number.isFinite(elapsed) && elapsed >= 0 && elapsed < cooldown;
+  write({...previous, lastVisit: now});
+  return {previous, repeated};
+ }
+ // Serialize simultaneous tabs where Web Locks is supported.
+ let visit;
+ try {
+  visit = navigator.locks
+   ? await navigator.locks.request(key, claimVisit)
+   : claimVisit();
+ } catch { visit = claimVisit(); }
+ const cached = String(visit.previous.total ?? '');
+ if (/^\d+$/.test(cached)) {
+  count.textContent = cached;
+  count.title = '上次取得的總瀏覽次數';
+  unit.hidden = false;
+ }
+ if (visit.repeated) {
+  if (!/^\d+$/.test(cached)) count.textContent = '暫時無法取得';
+  return;
+ }
  let timeout;
  const observer = new MutationObserver(() => {
-  if (!/^\d+$/.test(count.textContent.trim())) return;
+  const total = count.textContent.trim();
+  if (!/^\d+$/.test(total)) return;
   unit.hidden = false;
+  count.removeAttribute('title');
+  write({...read(), total});
   clearTimeout(timeout);
   observer.disconnect();
  });
