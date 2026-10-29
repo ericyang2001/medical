@@ -1,11 +1,16 @@
 'use strict';
 const data=window.MEDICAL_LIBRARY;
+const appScript=document.currentScript;
+const assetVersion=appScript?.src || data.updated;
 const $=id=>document.getElementById(id);
 const escapeHTML=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shelfBooks=data.books.filter(b=>b.category!=='使用指南');
-// Build a plain-text index once; table and reference contents are searchable too.
+// Build the full-text index only when the first non-empty search needs it.
 const normalizeSearch=value=>value.replace(/\s+/g,' ').trim().toLocaleLowerCase();
-const searchIndex=shelfBooks.flatMap(book=>book.sections.map(section=>{
+let searchIndex;
+function getSearchIndex(){
+ if(searchIndex)return searchIndex;
+ searchIndex=shelfBooks.flatMap(book=>book.sections.map(section=>{
  const container=document.createElement('div');container.innerHTML=section.html;
  container.querySelectorAll('script,style').forEach(node=>node.remove());
  container.querySelectorAll('br').forEach(node=>node.replaceWith(' '));
@@ -13,23 +18,44 @@ const searchIndex=shelfBooks.flatMap(book=>book.sections.map(section=>{
  const text=container.textContent.replace(/\s+/g,' ').trim();
  return {book,section,text,searchable:normalizeSearch(section.title+' '+text)};
 }));
-function searchMatches(query){return searchIndex.filter(entry=>entry.searchable.includes(query));}
+ return searchIndex;
+}
+function searchMatches(query){return getSearchIndex().filter(entry=>entry.searchable.includes(query));}
 function searchSnippet(text,query){
  const index=text.toLocaleLowerCase().indexOf(query);
  const start=Math.max(0,index-42),end=Math.min(text.length,(index<0?0:index)+query.length+100);
  const excerpt=text.slice(start,end);const at=excerpt.toLocaleLowerCase().indexOf(query);
  return (start?'…':'')+(at<0?escapeHTML(excerpt):escapeHTML(excerpt.slice(0,at))+'<mark>'+escapeHTML(excerpt.slice(at,at+query.length))+'</mark>'+escapeHTML(excerpt.slice(at+query.length)))+(end<text.length?'…':'');
 }
-$('search').addEventListener('input',renderBooks);
+// Coalesce rapid typing and wait for Chinese IME composition to finish.
+let searchTimer,composing=false,lastRenderedQuery;
+let renderedShelfKey;
+const bookSearchText=new Map(shelfBooks.map(b=>[b.id,normalizeSearch([b.title,b.subtitle,b.category,...b.tags].join(' '))]));
+function scheduleSearch(){
+ clearTimeout(searchTimer);
+ if(!composing)searchTimer=setTimeout(renderBooks,150);
+}
+$('search').addEventListener('compositionstart',()=>{composing=true;clearTimeout(searchTimer)});
+$('search').addEventListener('compositionend',()=>{composing=false;scheduleSearch()});
+$('search').addEventListener('input',event=>{if(!event.isComposing)scheduleSearch()});
+$('search').addEventListener('keydown',event=>{if(event.key==='Enter'&&!composing&&!event.isComposing){clearTimeout(searchTimer);renderBooks()}});
+
 function renderBooks(){
  const query=normalizeSearch($('search').value);
+ if(query===lastRenderedQuery)return;
+ lastRenderedQuery=query;
  const matches=query?searchMatches(query):[];
- const books=shelfBooks.filter(b=>!query||normalizeSearch([b.title,b.subtitle,b.category,...b.tags].join(' ')).includes(query)||matches.some(entry=>entry.book.id===b.id));
+ const matchedBookIds=new Set(matches.map(entry=>entry.book.id));
+ const books=shelfBooks.filter(b=>!query||bookSearchText.get(b.id).includes(query)||matchedBookIds.has(b.id));
  $('count').textContent=`${books.length} 本館藏`;$('shelf-label').textContent=query?'符合搜尋的館藏':'全部館藏';
+ const shelfKey=JSON.stringify(books.map(b=>b.id));
+ if(shelfKey!==renderedShelfKey){
+ renderedShelfKey=shelfKey;
  const bookCovers=books.map(b=>`<a class="book" href="#book/${encodeURIComponent(b.id)}" style="--book:${b.color}" aria-label="閱讀${escapeHTML(b.title)}"><span class="number">VOL. ${String(shelfBooks.indexOf(b)+1).padStart(2,'0')}</span><div><h3>${escapeHTML(b.title)}</h3><small>${escapeHTML(b.subtitle)}</small></div><div class="book-bottom"><span>${escapeHTML(b.category)}</span></div></a>`);
  $('books').innerHTML=Array.from({length:Math.ceil(bookCovers.length/10)},(_,row)=>
   '<div class="shelf-row" role="group" aria-label="第 '+(row+1)+' 排書架">'+bookCovers.slice(row*10,row*10+10).join('')+'</div>'
  ).join('');
+ }
 
  $('empty').hidden=books.length!==0||shelfBooks.length===0;$('empty').textContent='找不到符合的內容，試試其他關鍵字。';
  $('search-results').hidden=!query;
@@ -58,15 +84,61 @@ function revealSearchTarget(sectionId,query){
  requestAnimationFrame(()=>{target.scrollIntoView({block:'center',inline:'center',behavior:'instant'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});});
 }
 
-function route(){const [path,params='']=location.hash.split('?');const match=path.match(/^#book\/([^/]+)(?:\/([^/]+))?$/);let book;if(match){try{book=data.books.find(b=>b.id===decodeURIComponent(match[1]))}catch{book=null}}if(match){$('library').hidden=true;$('reader').hidden=false;if(!book){$('reader-title').textContent='找不到這本書';$('reader-category').textContent='';$('toc').replaceChildren();$('chapter-select').innerHTML='<option value="">沒有可選章節</option>';$('chapter-select').disabled=true;$('article').innerHTML='<h1>這本書尚未上架</h1><p>請返回書架，選擇現有館藏。</p>';document.title='醫學加油站'}else{$('reader-title').textContent=book.title;$('reader-category').textContent=book.category;$('chapter-select').disabled=false;$('chapter-select').innerHTML='<option value="">選擇要閱讀的段落</option>'+book.sections.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');$('toc').innerHTML=book.sections.map(s=>`<a href="#section-${escapeHTML(s.id)}" data-section="${escapeHTML(s.id)}">${escapeHTML(s.title)}</a>`).join('');$('article').innerHTML=`<div class="label">${escapeHTML(book.subtitle)}</div><h1>${escapeHTML(book.title)}</h1>`+book.sections.map(s=>`<section id="section-${escapeHTML(s.id)}"><h2>${escapeHTML(s.title)}</h2>${s.html}</section>`).join('');if(book.category==='使用指南')$('article').insertAdjacentHTML('beforeend','<nav class="guide-links" aria-label="其他使用指南">'+data.books.filter(b=>b.category==='使用指南'&&b.id!==book.id).map(b=>'<a href="#book/'+encodeURIComponent(b.id)+'">'+escapeHTML(b.title)+' ↗</a>').join('')+'</nav>');document.title='醫學加油站'}window.mountLabCalculator?.();window.scrollTo(0,0);$('article').focus({preventScroll:true});if(book&&match[2]){try{revealSearchTarget(decodeURIComponent(match[2]),normalizeSearch(new URLSearchParams(params).get('q')||''))}catch{}}}else{$('library').hidden=false;$('reader').hidden=true;document.title='醫學加油站';if(location.hash==='#collection')requestAnimationFrame(()=>$('collection').scrollIntoView());else window.scrollTo(0,0)}}
+// Fetch and execute calculator code only for its actual reader page.
+let calculatorLoad;
+function mountCalculatorWhenNeeded(){
+ const host=$('lab-calculator');
+ if(!host)return;
+ if(window.mountLabCalculator){window.mountLabCalculator();return}
+ host.textContent='公式計算器載入中…';
+ if(!calculatorLoad){
+  calculatorLoad=new Promise((resolve,reject)=>{
+   const script=document.createElement('script');
+   script.src=appScript?.dataset.calculators || 'calculators.js?v=20261029-views';
+   script.onload=resolve;
+   script.onerror=()=>{script.remove();calculatorLoad=null;reject(new Error('Calculator unavailable'))};
+   document.head.appendChild(script);
+  });
+ }
+ calculatorLoad.then(()=>{
+  if($('lab-calculator')===host&&!$('reader').hidden&&!host.querySelector('form'))window.mountLabCalculator?.();
+ }).catch(()=>{
+  if($('lab-calculator')!==host)return;
+  host.textContent='計算器暫時無法載入。';
+  const retry=document.createElement('button');retry.type='button';retry.textContent='重試';
+  retry.addEventListener('click',mountCalculatorWhenNeeded);host.append(retry);
+ });
+}
+
+function route(){const [path,params='']=location.hash.split('?');const match=path.match(/^#book\/([^/]+)(?:\/([^/]+))?$/);let book;if(match){try{book=data.books.find(b=>b.id===decodeURIComponent(match[1]))}catch{book=null}}if(match){$('library').hidden=true;$('reader').hidden=false;if(!book){$('reader-title').textContent='找不到這本書';$('reader-category').textContent='';$('toc').replaceChildren();$('chapter-select').innerHTML='<option value="">沒有可選章節</option>';$('chapter-select').disabled=true;$('article').innerHTML='<h1>這本書尚未上架</h1><p>請返回書架，選擇現有館藏。</p>';document.title='醫學加油站'}else{$('reader-title').textContent=book.title;$('reader-category').textContent=book.category;$('chapter-select').disabled=false;$('chapter-select').innerHTML='<option value="">選擇要閱讀的段落</option>'+book.sections.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');$('toc').innerHTML=book.sections.map(s=>`<a href="#section-${escapeHTML(s.id)}" data-section="${escapeHTML(s.id)}">${escapeHTML(s.title)}</a>`).join('');$('article').innerHTML=`<div class="label">${escapeHTML(book.subtitle)}</div><h1>${escapeHTML(book.title)}</h1>`+book.sections.map(s=>`<section id="section-${escapeHTML(s.id)}"><h2>${escapeHTML(s.title)}</h2>${s.html}</section>`).join('');if(book.category==='使用指南')$('article').insertAdjacentHTML('beforeend','<nav class="guide-links" aria-label="其他使用指南">'+data.books.filter(b=>b.category==='使用指南'&&b.id!==book.id).map(b=>'<a href="#book/'+encodeURIComponent(b.id)+'">'+escapeHTML(b.title)+' ↗</a>').join('')+'</nav>');document.title='醫學加油站'}mountCalculatorWhenNeeded();window.scrollTo(0,0);$('article').focus({preventScroll:true});if(book&&match[2]){try{revealSearchTarget(decodeURIComponent(match[2]),normalizeSearch(new URLSearchParams(params).get('q')||''))}catch{}}}else{$('library').hidden=false;$('reader').hidden=true;document.title='醫學加油站';if(location.hash==='#collection')requestAnimationFrame(()=>$('collection').scrollIntoView());else window.scrollTo(0,0)}}
 $('toc').addEventListener('click',event=>{const link=event.target.closest('[data-section]');if(!link)return;event.preventDefault();$('section-'+link.dataset.section)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})});
 $('chapter-select').addEventListener('change',event=>{const id=event.target.value;if(!id)return;const section=$('section-'+id);if(!section)return;section.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});const heading=section.querySelector('h2');if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}});
 window.addEventListener('hashchange',route);
 document.addEventListener('keydown',event=>{if(event.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('library').hidden){event.preventDefault();$('search').focus()}});
 function showDate(value){const date=new Date(value);if(Number.isNaN(date.getTime()))return;$('updated').dateTime=date.toISOString();$('updated').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(date).replaceAll('-','/');}
 showDate(data.updated);
-// Public repository metadata only. If offline/rate-limited, keep the bundled content date.
-fetch('https://api.github.com/repos/ericyang2001/medical/commits?sha=main&per_page=1',{headers:{Accept:'application/vnd.github+json'}}).then(r=>{if(!r.ok)throw Error('Date unavailable');return r.json()}).then(commits=>{const date=commits?.[0]?.commit?.committer?.date;if(date)showDate(date)}).catch(()=>{});
+// Cache public update metadata for six hours; a new app version invalidates it.
+(async function updateDate(){
+ if(location.hostname!=='ericyang2001.github.io')return;
+ const key='medical-bookshelf:updated-date:v1';
+ let cached;
+ try{cached=JSON.parse(localStorage.getItem(key)||'null')}catch{}
+ if(cached?.date)showDate(cached.date);
+ const now=Date.now(),age=now-cached?.checkedAt;
+ if(cached?.version===assetVersion&&age>=0&&age<6*60*60*1000)return;
+ const controller=new AbortController();
+ const timeout=setTimeout(()=>controller.abort(),8000);
+ let date=cached?.date || data.updated;
+ try{
+  const response=await fetch('https://api.github.com/repos/ericyang2001/medical/commits?sha=main&per_page=1',{headers:{Accept:'application/vnd.github+json'},signal:controller.signal});
+  if(!response.ok)throw new Error('Date unavailable');
+  const commits=await response.json();
+  const latest=commits?.[0]?.commit?.committer?.date;
+  if(latest&&!Number.isNaN(new Date(latest).getTime()))date=latest;
+ }catch{}finally{clearTimeout(timeout)}
+ showDate(date);
+ try{localStorage.setItem(key,JSON.stringify({version:assetVersion,checkedAt:now,date}))}catch{}
+})();
 renderBooks();route();
 
 // Reload the current page, preserving its route.

@@ -251,3 +251,8 @@ footer .visit-counter-retry{border:0;border-bottom:1px solid currentColor;backgr
  .desktop-shelf-hint{display:none}
  .mobile-shelf-hint{display:inline}
 }
+
+/* Touch devices retain the translucent controls without live backdrop filtering. */
+@media(hover:none) and (pointer:coarse){
+ .refresh-page,.library-card .card-enter{-webkit-backdrop-filter:none;backdrop-filter:none}
+}
