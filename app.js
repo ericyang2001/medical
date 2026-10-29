@@ -69,17 +69,16 @@ renderBooks();route();
 document.getElementById("refresh-page")?.addEventListener("click", () => window.location.reload());
 
 
-// Shared page-view counter. Suppress repeat loads until five minutes of inactivity.
-// Reserve the visit before the request: a slow response must not cause double counting.
+// Shared total stored by Hits.sh. Repeated loads only READ the shared total.
 (async function initViewCounter() {
- const count = document.getElementById('busuanzi_value_site_pv');
+ const count = document.getElementById('visit-counter-value');
  const unit = document.getElementById('visit-counter-unit');
  if (!count || !unit) return;
  if (location.hostname !== 'ericyang2001.github.io') {
   count.textContent = '預覽不計數';
   return;
  }
- const key = 'medical-bookshelf:page-view:v1';
+ const key = 'medical-bookshelf:page-view:hits:v2';
  const cooldown = 5 * 60 * 1000;
  let storage;
  for (const name of ['localStorage', 'sessionStorage']) {
@@ -95,52 +94,67 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
   try { return JSON.parse(storage?.getItem(key) || '{}') || {}; }
   catch { return {}; }
  }
- function write(value) {
-  try { storage?.setItem(key, JSON.stringify(value)); } catch {}
- }
  function claimVisit() {
   const previous = read();
   const now = Date.now();
   const elapsed = now - Number(previous.lastVisit);
   const repeated = Number.isFinite(elapsed) && elapsed >= 0 && elapsed < cooldown;
-  write({...previous, lastVisit: now});
-  return {previous, repeated};
+  // Reserve before requesting, protecting simultaneous tabs and rapid reloads.
+  // Read requests are never suppressed, even after a failed network request.
+  try { storage?.setItem(key, JSON.stringify({lastVisit: now})); } catch {}
+  return repeated;
  }
- // Serialize simultaneous tabs where Web Locks is supported.
- let visit;
+ let repeated;
  try {
-  visit = navigator.locks
+  repeated = navigator.locks
    ? await navigator.locks.request(key, claimVisit)
    : claimVisit();
- } catch { visit = claimVisit(); }
- const cached = String(visit.previous.total ?? '');
- if (/^\d+$/.test(cached)) {
-  count.textContent = cached;
-  count.title = '上次取得的總瀏覽次數';
-  unit.hidden = false;
+ } catch { repeated = claimVisit(); }
+
+ const counter = 'ericyang2001.github.io/medical';
+ const style = '&label=%20&color=254d43&labelColor=254d43&style=flat-square';
+ const incrementURL = 'https://hits.sh/' + counter + '.svg?view=total' + style;
+ // The statistics endpoint is read-only; Shields renders its JSON as an image
+ // without cross-origin JSON restrictions. Read displays may lag by five minutes.
+ const readURL = 'https://img.shields.io/badge/dynamic/json?url=' +
+  encodeURIComponent('https://hits.sh/api/urns/' + counter) +
+  '&query=%24.total&cacheSeconds=300' + style;
+ function showCounter(url, canFallback) {
+  const badge = document.createElement('img');
+  badge.alt = '累計瀏覽次數';
+  badge.className = 'visit-counter-number';
+  badge.referrerPolicy = 'no-referrer';
+  let finished = false;
+  const timeout = setTimeout(fail, 20000);
+  function fail() {
+   if (finished) return;
+   finished = true;
+   clearTimeout(timeout);
+   badge.onload = badge.onerror = null;
+   if (canFallback) showCounter(readURL, false);
+   else {
+    count.textContent = '暫時無法取得';
+    unit.hidden = true;
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'visit-counter-retry';
+    retry.textContent = '重試';
+    retry.addEventListener('click', () => {
+     count.textContent = '載入中…';
+     showCounter(readURL, false);
+    });
+    count.append(' ', retry);
+   }
+  }
+  badge.onload = () => {
+   if (finished) return;
+   finished = true;
+   clearTimeout(timeout);
+   count.replaceChildren(badge);
+   unit.hidden = false;
+  };
+  badge.onerror = fail;
+  badge.src = url;
  }
- if (visit.repeated) {
-  if (!/^\d+$/.test(cached)) count.textContent = '暫時無法取得';
-  return;
- }
- let timeout;
- const observer = new MutationObserver(() => {
-  const total = count.textContent.trim();
-  if (!/^\d+$/.test(total)) return;
-  unit.hidden = false;
-  count.removeAttribute('title');
-  write({...read(), total});
-  clearTimeout(timeout);
-  observer.disconnect();
- });
- observer.observe(count, {childList:true, characterData:true, subtree:true});
- const script = document.createElement('script');
- script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
- script.async = true;
- function unavailable() {
-  if (!/^\d+$/.test(count.textContent.trim())) count.textContent = '暫時無法取得';
- }
- script.onerror = unavailable;
- timeout = setTimeout(unavailable, 12000);
- document.head.appendChild(script);
+ showCounter(repeated ? readURL : incrementURL, !repeated);
 })();

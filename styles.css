@@ -233,3 +233,6 @@ article .drug-source-content mark.pdf-bold-highlight{color:inherit;font-weight:9
 footer .visit-counter{margin:12px 0 0;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
 footer .visit-counter span{display:inline;margin:0}
 footer .visit-counter [hidden]{display:none}
+
+footer .visit-counter-number{height:20px;width:auto;vertical-align:middle;border-radius:4px;display:inline-block}
+footer .visit-counter-retry{border:0;border-bottom:1px solid currentColor;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:0 2px}
