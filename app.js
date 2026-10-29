@@ -67,3 +67,33 @@ renderBooks();route();
 
 // Reload the current page, preserving its route.
 document.getElementById("refresh-page")?.addEventListener("click", () => window.location.reload());
+
+
+// Shared public page-view counter: one request per full production page load.
+// Hash navigation stays within the same page and does not record extra views.
+(function initViewCounter() {
+ const count = document.getElementById('busuanzi_value_site_pv');
+ const unit = document.getElementById('visit-counter-unit');
+ if (!count || !unit) return;
+ if (location.hostname !== 'ericyang2001.github.io') {
+  count.textContent = '預覽不計數';
+  return;
+ }
+ let timeout;
+ const observer = new MutationObserver(() => {
+  if (!/^\d+$/.test(count.textContent.trim())) return;
+  unit.hidden = false;
+  clearTimeout(timeout);
+  observer.disconnect();
+ });
+ observer.observe(count, {childList:true, characterData:true, subtree:true});
+ const script = document.createElement('script');
+ script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+ script.async = true;
+ function unavailable() {
+  if (!/^\d+$/.test(count.textContent.trim())) count.textContent = '暫時無法取得';
+ }
+ script.onerror = unavailable;
+ timeout = setTimeout(unavailable, 12000);
+ document.head.appendChild(script);
+})();

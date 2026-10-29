@@ -228,3 +228,8 @@ article .drug-source-content mark.pdf-bold-highlight{color:inherit;font-weight:9
 .sugar-source-content h3{margin:28px 0 14px;padding-left:12px;border-left:3px solid #b48b48}
 .sugar-source-content .source-note{margin-bottom:24px}
 @media(max-width:600px){.sugar-flow{display:block}.sugar-flow li{margin-bottom:23px}.sugar-flow li:not(:last-child)::after{content:'↓';right:calc(50% - 7px);top:auto;bottom:-27px}}
+
+/* Shared visitor count in the existing library footer. */
+footer .visit-counter{margin:12px 0 0;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+footer .visit-counter span{display:inline;margin:0}
+footer .visit-counter [hidden]{display:none}
