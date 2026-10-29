@@ -220,3 +220,11 @@ article .drug-source-table{min-width:740px}
 .drug-source-content .drug-callout-label+p{margin:0 0 20px;padding:10px 18px 16px;background:#f4efdf;border-left:3px solid #b48b48;border-radius:0 0 8px 0}
 article .drug-source-content mark.pdf-bold-highlight{color:inherit;font-weight:900;background:linear-gradient(transparent 18%,rgba(250,220,90,.48) 18%,rgba(250,220,90,.48) 94%,transparent 94%);padding:0 .04em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 @media(max-width:600px){article .drug-source-table{min-width:720px;font-size:15px}.drug-source-content h4{font-size:17px}}
+
+/* Blood sugar handbook: source flow diagrams in a responsive reading order. */
+.sugar-flow{list-style:none;display:flex;flex-wrap:wrap;gap:22px;margin:22px 0 28px;padding:0;align-items:stretch}
+.sugar-flow li{position:relative;flex:1 1 130px;padding:14px 16px;background:#edf1e8;border:1px solid #cbd6c4;border-radius:9px;font-size:15px;line-height:1.8;color:#254d43}
+.sugar-flow li:not(:last-child)::after{content:'→';position:absolute;right:-19px;top:calc(50% - 14px);color:#66745c;font-size:18px}
+.sugar-source-content h3{margin:28px 0 14px;padding-left:12px;border-left:3px solid #b48b48}
+.sugar-source-content .source-note{margin-bottom:24px}
+@media(max-width:600px){.sugar-flow{display:block}.sugar-flow li{margin-bottom:23px}.sugar-flow li:not(:last-child)::after{content:'↓';right:calc(50% - 7px);top:auto;bottom:-27px}}
