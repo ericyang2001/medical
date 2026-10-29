@@ -26,7 +26,11 @@ function renderBooks(){
  const matches=query?searchMatches(query):[];
  const books=shelfBooks.filter(b=>!query||normalizeSearch([b.title,b.subtitle,b.category,...b.tags].join(' ')).includes(query)||matches.some(entry=>entry.book.id===b.id));
  $('count').textContent=`${books.length} 本館藏`;$('shelf-label').textContent=query?'符合搜尋的館藏':'全部館藏';
- $('books').innerHTML=books.map(b=>`<a class="book" href="#book/${encodeURIComponent(b.id)}" style="--book:${b.color}" aria-label="閱讀${escapeHTML(b.title)}"><span class="number">VOL. ${String(shelfBooks.indexOf(b)+1).padStart(2,'0')}</span><div><h3>${escapeHTML(b.title)}</h3><small>${escapeHTML(b.subtitle)}</small></div><div class="book-bottom"><span>${escapeHTML(b.category)}</span></div></a>`).join('');
+ const bookCovers=books.map(b=>`<a class="book" href="#book/${encodeURIComponent(b.id)}" style="--book:${b.color}" aria-label="閱讀${escapeHTML(b.title)}"><span class="number">VOL. ${String(shelfBooks.indexOf(b)+1).padStart(2,'0')}</span><div><h3>${escapeHTML(b.title)}</h3><small>${escapeHTML(b.subtitle)}</small></div><div class="book-bottom"><span>${escapeHTML(b.category)}</span></div></a>`);
+ $('books').innerHTML=Array.from({length:Math.ceil(bookCovers.length/10)},(_,row)=>
+  '<div class="shelf-row" role="group" aria-label="第 '+(row+1)+' 排書架">'+bookCovers.slice(row*10,row*10+10).join('')+'</div>'
+ ).join('');
+
  $('empty').hidden=books.length!==0||shelfBooks.length===0;$('empty').textContent='找不到符合的內容，試試其他關鍵字。';
  $('search-results').hidden=!query;
  $('search-status').textContent=query?`找到 ${matches.length} 個符合的段落`:'';
