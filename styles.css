@@ -277,3 +277,7 @@ article .drug-name-table tbody th{min-width:0;word-break:normal}
 article .drug-name-table td:first-child{min-width:0}
 .drug-name-table tr:focus{outline:3px solid #b48b48;outline-offset:-3px;background:#f8efcf}
 @media(max-width:600px){.drug-name-finder{padding:14px}.drug-name-result-top{display:block}.drug-name-result dl>div{grid-template-columns:82px minmax(0,1fr);gap:8px}.drug-name-search-controls{flex-wrap:wrap}.drug-name-search-controls input{flex-basis:100%}article .drug-name-result{padding:13px}article .drug-name-table{min-width:950px;font-size:14px}}
+
+/* Keep source medication doses on a single line, with horizontal table scrolling. */
+article .drug-name-table{table-layout:auto}
+article .drug-name-table .drug-dose{white-space:nowrap;overflow-wrap:normal;word-break:normal}
