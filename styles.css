@@ -301,3 +301,9 @@ article .drug-name-result h3,.drug-name-result dd{overflow-wrap:normal;word-brea
 .drug-name-result-top{min-width:0}
 article .drug-name-result h3{min-width:0;overflow-x:auto}
 @media(max-width:600px){.drug-name-search-controls{gap:8px;padding:0 12px}.drug-name-search-controls input{font-size:16px;flex-basis:0}}
+
+/* Hide idle search instructions; retain feedback after a query. */
+#drug-name-status:empty,.drug-name-finder:has(#drug-name-search:placeholder-shown) #drug-name-status{display:none}
+article .drug-name-table{font-size:17px}
+.drug-name-result dl>div{font-size:17px}
+@media(max-width:600px){article .drug-name-table{font-size:16px}.drug-name-result dl>div{font-size:16px}}
