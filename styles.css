@@ -256,3 +256,24 @@ footer .visit-counter-retry{border:0;border-bottom:1px solid currentColor;backgr
 @media(hover:none) and (pointer:coarse){
  .refresh-page,.library-card .card-enter{-webkit-backdrop-filter:none;backdrop-filter:none}
 }
+
+/* Source-faithful drug directory and its on-demand local search. */
+.drug-name-finder{padding:22px;background:#edf1e8;border:1px solid #cbd6c4;border-radius:12px;margin:18px 0 26px}
+.drug-name-finder>label{display:block;font-size:20px;font-weight:900;margin-bottom:12px}
+.drug-name-search-controls{display:flex;gap:10px;align-items:stretch}
+.drug-name-search-controls input{min-width:0;flex:1;background:#fffdf7;border:1px solid #b8c5af;border-radius:8px;padding:12px;color:var(--ink);font-size:16px}
+.drug-name-finder button{border:1px solid #b8c5af;border-radius:8px;padding:9px 13px;background:#fffdf7;color:var(--ink);cursor:pointer;font:inherit;font-size:14px}
+#drug-name-search-help,#drug-name-status{font-size:14px;line-height:1.8}
+article .drug-name-result{border:1px solid #d0dacb;border-radius:10px;background:#fffdf7;padding:18px;margin:16px 0 0}
+.drug-name-result-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+article .drug-name-result h3{margin:0;font-size:19px;overflow-wrap:anywhere}
+.drug-name-result-top>span{font-size:12px;white-space:nowrap;color:var(--muted)}
+.drug-name-result dl{margin:14px 0}
+.drug-name-result dl>div{display:grid;grid-template-columns:115px minmax(0,1fr);gap:12px;padding:9px 0;border-top:1px solid #e4e7dc;font-size:15px;line-height:1.8}
+.drug-name-result dt{font-weight:900}.drug-name-result dd{margin:0;overflow-wrap:anywhere;color:#52634f}
+.drug-name-more{display:block;width:100%;margin-top:15px}
+article .drug-name-table{min-width:980px;line-height:1.8}
+article .drug-name-table tbody th{min-width:0;word-break:normal}
+article .drug-name-table td:first-child{min-width:0}
+.drug-name-table tr:focus{outline:3px solid #b48b48;outline-offset:-3px;background:#f8efcf}
+@media(max-width:600px){.drug-name-finder{padding:14px}.drug-name-result-top{display:block}.drug-name-result dl>div{grid-template-columns:82px minmax(0,1fr);gap:8px}.drug-name-search-controls{flex-wrap:wrap}.drug-name-search-controls input{flex-basis:100%}article .drug-name-result{padding:13px}article .drug-name-table{min-width:950px;font-size:14px}}

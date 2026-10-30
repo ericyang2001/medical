@@ -110,7 +110,30 @@ function mountCalculatorWhenNeeded(){
  });
 }
 
-function route(){const [path,params='']=location.hash.split('?');const match=path.match(/^#book\/([^/]+)(?:\/([^/]+))?$/);let book;if(match){try{book=data.books.find(b=>b.id===decodeURIComponent(match[1]))}catch{book=null}}if(match){$('library').hidden=true;$('reader').hidden=false;if(!book){$('reader-title').textContent='找不到這本書';$('reader-category').textContent='';$('toc').replaceChildren();$('chapter-select').innerHTML='<option value="">沒有可選章節</option>';$('chapter-select').disabled=true;$('article').innerHTML='<h1>這本書尚未上架</h1><p>請返回書架，選擇現有館藏。</p>';document.title='醫學加油站'}else{$('reader-title').textContent=book.title;$('reader-category').textContent=book.category;$('chapter-select').disabled=false;$('chapter-select').innerHTML='<option value="">選擇要閱讀的段落</option>'+book.sections.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');$('toc').innerHTML=book.sections.map(s=>`<a href="#section-${escapeHTML(s.id)}" data-section="${escapeHTML(s.id)}">${escapeHTML(s.title)}</a>`).join('');$('article').innerHTML=`<div class="label">${escapeHTML(book.subtitle)}</div><h1>${escapeHTML(book.title)}</h1>`+book.sections.map(s=>`<section id="section-${escapeHTML(s.id)}"><h2>${escapeHTML(s.title)}</h2>${s.html}</section>`).join('');if(book.category==='使用指南')$('article').insertAdjacentHTML('beforeend','<nav class="guide-links" aria-label="其他使用指南">'+data.books.filter(b=>b.category==='使用指南'&&b.id!==book.id).map(b=>'<a href="#book/'+encodeURIComponent(b.id)+'">'+escapeHTML(b.title)+' ↗</a>').join('')+'</nav>');document.title='醫學加油站'}mountCalculatorWhenNeeded();window.scrollTo(0,0);$('article').focus({preventScroll:true});if(book&&match[2]){try{revealSearchTarget(decodeURIComponent(match[2]),normalizeSearch(new URLSearchParams(params).get('q')||''))}catch{}}}else{$('library').hidden=false;$('reader').hidden=true;document.title='醫學加油站';if(location.hash==='#collection')requestAnimationFrame(()=>$('collection').scrollIntoView());else window.scrollTo(0,0)}}
+// Load searchable drug records only when this book is opened.
+let drugNameLoad;
+function mountDrugNamesWhenNeeded(){
+ const host=$('drug-name-finder');if(!host)return;
+ if(window.mountDrugNameFinder){window.mountDrugNameFinder();return}
+ const status=host.querySelector('#drug-name-status');
+ const input=host.querySelector('#drug-name-search');input.disabled=true;
+ status.textContent='藥品搜尋資料載入中…';
+ if(!drugNameLoad)drugNameLoad=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');script.src='drug-names.js?v=20261030-drugnames';
+  script.onload=resolve;script.onerror=()=>{script.remove();drugNameLoad=null;reject(new Error('Drug search unavailable'))};
+  document.head.appendChild(script);
+ });
+ drugNameLoad.then(()=>{
+  if($('drug-name-finder')!==host)return;
+  input.disabled=false;status.textContent='輸入藥名即可查看相關資訊。';window.mountDrugNameFinder?.();
+ }).catch(()=>{
+  if($('drug-name-finder')!==host)return;
+  status.textContent='搜尋資料暫時無法載入，仍可閱讀下方原表。';
+  const retry=document.createElement('button');retry.type='button';retry.textContent='重試';retry.addEventListener('click',mountDrugNamesWhenNeeded);status.append(' ',retry);
+ });
+}
+
+function route(){const [path,params='']=location.hash.split('?');const match=path.match(/^#book\/([^/]+)(?:\/([^/]+))?$/);let book;if(match){try{book=data.books.find(b=>b.id===decodeURIComponent(match[1]))}catch{book=null}}if(match){$('library').hidden=true;$('reader').hidden=false;if(!book){$('reader-title').textContent='找不到這本書';$('reader-category').textContent='';$('toc').replaceChildren();$('chapter-select').innerHTML='<option value="">沒有可選章節</option>';$('chapter-select').disabled=true;$('article').innerHTML='<h1>這本書尚未上架</h1><p>請返回書架，選擇現有館藏。</p>';document.title='醫學加油站'}else{$('reader-title').textContent=book.title;$('reader-category').textContent=book.category;$('chapter-select').disabled=false;$('chapter-select').innerHTML='<option value="">選擇要閱讀的段落</option>'+book.sections.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');$('toc').innerHTML=book.sections.map(s=>`<a href="#section-${escapeHTML(s.id)}" data-section="${escapeHTML(s.id)}">${escapeHTML(s.title)}</a>`).join('');$('article').innerHTML=`<div class="label">${escapeHTML(book.subtitle)}</div><h1>${escapeHTML(book.title)}</h1>`+book.sections.map(s=>`<section id="section-${escapeHTML(s.id)}"><h2>${escapeHTML(s.title)}</h2>${s.html}</section>`).join('');if(book.category==='使用指南')$('article').insertAdjacentHTML('beforeend','<nav class="guide-links" aria-label="其他使用指南">'+data.books.filter(b=>b.category==='使用指南'&&b.id!==book.id).map(b=>'<a href="#book/'+encodeURIComponent(b.id)+'">'+escapeHTML(b.title)+' ↗</a>').join('')+'</nav>');document.title='醫學加油站'}mountCalculatorWhenNeeded();mountDrugNamesWhenNeeded();window.scrollTo(0,0);$('article').focus({preventScroll:true});if(book&&match[2]){try{revealSearchTarget(decodeURIComponent(match[2]),normalizeSearch(new URLSearchParams(params).get('q')||''))}catch{}}}else{$('library').hidden=false;$('reader').hidden=true;document.title='醫學加油站';if(location.hash==='#collection')requestAnimationFrame(()=>$('collection').scrollIntoView());else window.scrollTo(0,0)}}
 $('toc').addEventListener('click',event=>{const link=event.target.closest('[data-section]');if(!link)return;event.preventDefault();$('section-'+link.dataset.section)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})});
 $('chapter-select').addEventListener('change',event=>{const id=event.target.value;if(!id)return;const section=$('section-'+id);if(!section)return;section.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});const heading=section.querySelector('h2');if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}});
 window.addEventListener('hashchange',route);
