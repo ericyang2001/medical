@@ -281,3 +281,23 @@ article .drug-name-table td:first-child{min-width:0}
 /* Keep source medication doses on a single line, with horizontal table scrolling. */
 article .drug-name-table{table-layout:auto}
 article .drug-name-table .drug-dose{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+
+/* Rounded, Google-inspired local medication search. */
+.drug-name-finder{padding:8px 0 20px;background:transparent;border:0;border-radius:0}
+.drug-name-finder>label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.drug-name-search-controls{display:flex;flex-wrap:nowrap;align-items:center;gap:12px;min-height:54px;padding:0 16px;background:#fff;border:1px solid #dadce0;border-radius:30px;box-shadow:0 1px 3px rgba(60,64,67,.08)}
+.drug-name-search-controls:hover,.drug-name-search-controls:focus-within{box-shadow:0 1px 6px rgba(32,33,36,.22);border-color:transparent}
+.drug-name-search-controls:focus-within{outline:2px solid #d7e5dc;outline-offset:2px}
+.drug-search-icon{flex:0 0 20px;width:20px;height:20px;color:#80868b}
+.drug-name-search-controls input{flex:1 1 0;min-width:0;width:0;border:0;border-radius:0;background:transparent;padding:14px 0;box-shadow:none;outline:none;font-size:16px;color:#202124}
+.drug-name-search-controls input:focus{outline:none;box-shadow:none}
+.drug-name-search-controls input::-webkit-search-cancel-button{-webkit-appearance:none}
+.drug-name-search-controls #drug-name-clear{flex:0 0 32px;width:32px;height:32px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:#70757a;font:26px/1 Arial,sans-serif}
+.drug-name-search-controls #drug-name-clear:hover{background:#f1f3f4}
+#drug-name-search-help,#drug-name-status{color:#70757a}
+article .drug-name-table td,article .drug-name-table th,
+article .drug-name-result h3,.drug-name-result dd{overflow-wrap:normal;word-break:normal;hyphens:none}
+.drug-name-result dd{min-width:0;overflow-x:auto}
+.drug-name-result-top{min-width:0}
+article .drug-name-result h3{min-width:0;overflow-x:auto}
+@media(max-width:600px){.drug-name-search-controls{gap:8px;padding:0 12px}.drug-name-search-controls input{font-size:16px;flex-basis:0}}
