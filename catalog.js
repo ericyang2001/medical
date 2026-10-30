@@ -399,7 +399,7 @@ window.MEDICAL_LIBRARY = {
         {
           "id": "drug-search",
           "title": "快速尋找藥品",
-          "html": "<div id=\"drug-name-finder\" class=\"drug-name-finder\"><label for=\"drug-name-search\">快速尋找藥品</label><div class=\"drug-name-search-controls\"><input id=\"drug-name-search\" type=\"search\" placeholder=\"輸入學名、商品名或別名，例如 Panadol、Acetaminophen\" autocomplete=\"off\" aria-describedby=\"drug-name-search-help\"><button id=\"drug-name-clear\" type=\"button\">清除</button></div><p id=\"drug-name-search-help\">搜尋原檔內的藥名；結果保留各劑型、分類與原表資料。</p><p id=\"drug-name-status\" role=\"status\" aria-live=\"polite\">輸入藥名即可查看相關資訊。</p><div id=\"drug-name-results\"></div></div>"
+          "html": "<div id=\"drug-name-finder\" class=\"drug-name-finder\"><label for=\"drug-name-search\">快速尋找藥品</label><div class=\"drug-name-search-controls\"><input id=\"drug-name-search\" type=\"search\" placeholder=\"輸入學名、商品名或別名\" autocomplete=\"off\" aria-describedby=\"drug-name-search-help\"><button id=\"drug-name-clear\" type=\"button\">清除</button></div><p id=\"drug-name-search-help\">搜尋原檔內的藥名；結果保留各劑型、分類與原表資料。</p><p id=\"drug-name-status\" role=\"status\" aria-live=\"polite\">輸入藥名即可查看相關資訊。</p><div id=\"drug-name-results\"></div></div>"
         },
         {
           "id": "page-01",
