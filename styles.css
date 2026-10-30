@@ -307,3 +307,7 @@ article .drug-name-result h3{min-width:0;overflow-x:auto}
 article .drug-name-table{font-size:17px}
 .drug-name-result dl>div{font-size:17px}
 @media(max-width:600px){article .drug-name-table{font-size:16px}.drug-name-result dl>div{font-size:16px}}
+
+/* Give supplementary notes enough room without compressing drug names or doses. */
+article .drug-name-detail-table{min-width:1250px}
+article .drug-name-detail-table .drug-supplement{min-width:360px;width:33%}
