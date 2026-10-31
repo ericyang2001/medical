@@ -332,3 +332,7 @@ article .symptom-subsection>h3{font-size:23px;margin:30px 0 18px;color:var(--ink
 #toc .toc-part{font-weight:900;margin-top:16px;color:var(--ink)}
 #toc .toc-subsection{padding-left:14px}
 @media(max-width:600px){article .symptom-part>h2{font-size:26px}article .symptom-subsection>h3{font-size:22px}.symptom-source-content h4{font-size:18px}}
+
+/* Keep the symptom handbook's first column and header rows free of highlights. */
+article .symptom-source-table .symptom-first-column mark,
+article .symptom-source-table thead mark{background:none;padding:0;color:inherit}
