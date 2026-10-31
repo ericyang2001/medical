@@ -311,3 +311,15 @@ article .drug-name-table{font-size:17px}
 /* Give supplementary notes enough room without compressing drug names or doses. */
 article .drug-name-detail-table{min-width:1250px}
 article .drug-name-detail-table .drug-supplement{min-width:360px;width:33%}
+
+/* Symptom handbook: original tables and source-bold highlights. */
+article .symptom-source-table{table-layout:auto;min-width:760px;font-size:17px;line-height:1.85}
+article .symptom-source-table td,article .symptom-source-table th{overflow-wrap:normal;word-break:normal;hyphens:none}
+.symptom-source-content h3{margin:28px 0 14px;padding-left:12px;border-left:3px solid #b48b48}
+.symptom-source-content p{line-height:1.95}
+.symptom-search-result{display:block;margin-top:14px}
+#symptom-status{font-size:14px;color:var(--muted);line-height:1.8}
+#symptom-status:empty{display:none}
+.drug-name-search-controls #symptom-clear{flex:0 0 32px;width:32px;height:32px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:#70757a;font:26px/1 Arial,sans-serif}
+.drug-name-search-controls #symptom-clear:hover{background:#f1f3f4}
+@media(max-width:600px){article .symptom-source-table{font-size:16px;min-width:720px}}

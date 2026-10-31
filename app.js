@@ -133,7 +133,39 @@ function mountDrugNamesWhenNeeded(){
  });
 }
 
-function route(){const [path,params='']=location.hash.split('?');const match=path.match(/^#book\/([^/]+)(?:\/([^/]+))?$/);let book;if(match){try{book=data.books.find(b=>b.id===decodeURIComponent(match[1]))}catch{book=null}}if(match){$('library').hidden=true;$('reader').hidden=false;if(!book){$('reader-title').textContent='找不到這本書';$('reader-category').textContent='';$('toc').replaceChildren();$('chapter-select').innerHTML='<option value="">沒有可選章節</option>';$('chapter-select').disabled=true;$('article').innerHTML='<h1>這本書尚未上架</h1><p>請返回書架，選擇現有館藏。</p>';document.title='醫學加油站'}else{$('reader-title').textContent=book.title;$('reader-category').textContent=book.category;$('chapter-select').disabled=false;$('chapter-select').innerHTML='<option value="">選擇要閱讀的段落</option>'+book.sections.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');$('toc').innerHTML=book.sections.map(s=>`<a href="#section-${escapeHTML(s.id)}" data-section="${escapeHTML(s.id)}">${escapeHTML(s.title)}</a>`).join('');$('article').innerHTML=`<div class="label">${escapeHTML(book.subtitle)}</div><h1>${escapeHTML(book.title)}</h1>`+book.sections.map(s=>`<section id="section-${escapeHTML(s.id)}"><h2>${escapeHTML(s.title)}</h2>${s.html}</section>`).join('');if(book.category==='使用指南')$('article').insertAdjacentHTML('beforeend','<nav class="guide-links" aria-label="其他使用指南">'+data.books.filter(b=>b.category==='使用指南'&&b.id!==book.id).map(b=>'<a href="#book/'+encodeURIComponent(b.id)+'">'+escapeHTML(b.title)+' ↗</a>').join('')+'</nav>');document.title='醫學加油站'}mountCalculatorWhenNeeded();mountDrugNamesWhenNeeded();window.scrollTo(0,0);$('article').focus({preventScroll:true});if(book&&match[2]){try{revealSearchTarget(decodeURIComponent(match[2]),normalizeSearch(new URLSearchParams(params).get('q')||''))}catch{}}}else{$('library').hidden=false;$('reader').hidden=true;document.title='醫學加油站';if(location.hash==='#collection')requestAnimationFrame(()=>$('collection').scrollIntoView());else window.scrollTo(0,0)}}
+// Index this handbook only after its first search; no background requests.
+let symptomSearchIndex;
+function mountSymptomSearch(){
+ const host=$('symptom-finder');if(!host||host.dataset.mounted)return;
+ host.dataset.mounted='true';
+ const input=$('symptom-search'),status=$('symptom-status'),results=$('symptom-results');
+ let timer,composing=false,lastQuery;
+ function search(){
+  const query=normalizeSearch(input.value);if(query===lastQuery)return;lastQuery=query;
+  if(!query){status.textContent='';results.replaceChildren();return}
+  if(!symptomSearchIndex){
+   const book=data.books.find(b=>b.id==='symptom-management');
+   symptomSearchIndex=book.sections.filter(s=>s.id!=='symptom-search'&&s.id!=='references').map(section=>{
+    const node=document.createElement('div');node.innerHTML=section.html;
+    node.querySelectorAll('br').forEach(n=>n.replaceWith(' '));
+    node.querySelectorAll('td,th,p,li,h3,h4').forEach(n=>n.append(' '));
+    const text=node.textContent.replace(/\s+/g,' ').trim();
+    return {section,text,searchable:normalizeSearch(section.title+' '+text)};
+   });
+  }
+  const terms=query.split(' '),matches=symptomSearchIndex.filter(e=>terms.every(t=>e.searchable.includes(t)));
+  status.textContent=matches.length?'找到 '+matches.length+' 個相關段落':'找不到符合的內容，請試試其他症狀或處置關鍵字。';
+  results.innerHTML=matches.map(({section,text})=>'<a class="search-result symptom-search-result" href="#book/symptom-management/'+encodeURIComponent(section.id)+'?q='+encodeURIComponent(terms[0])+'"><strong>'+escapeHTML(section.title)+'</strong><p>'+searchSnippet(text,terms[0])+'</p><span class="search-result-go">前往處置段落</span></a>').join('');
+ }
+ function schedule(){clearTimeout(timer);if(!composing)timer=setTimeout(search,150)}
+ input.addEventListener('input',e=>{if(!e.isComposing)schedule()});
+ input.addEventListener('compositionstart',()=>{composing=true;clearTimeout(timer)});
+ input.addEventListener('compositionend',()=>{composing=false;schedule()});
+ input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!composing&&!e.isComposing){e.preventDefault();clearTimeout(timer);search()}});
+ $('symptom-clear').addEventListener('click',()=>{clearTimeout(timer);input.value='';search();input.focus()});
+}
+
+function route(){const [path,params='']=location.hash.split('?');const match=path.match(/^#book\/([^/]+)(?:\/([^/]+))?$/);let book;if(match){try{book=data.books.find(b=>b.id===decodeURIComponent(match[1]))}catch{book=null}}if(match){$('library').hidden=true;$('reader').hidden=false;if(!book){$('reader-title').textContent='找不到這本書';$('reader-category').textContent='';$('toc').replaceChildren();$('chapter-select').innerHTML='<option value="">沒有可選章節</option>';$('chapter-select').disabled=true;$('article').innerHTML='<h1>這本書尚未上架</h1><p>請返回書架，選擇現有館藏。</p>';document.title='醫學加油站'}else{$('reader-title').textContent=book.title;$('reader-category').textContent=book.category;$('chapter-select').disabled=false;$('chapter-select').innerHTML='<option value="">選擇要閱讀的段落</option>'+book.sections.map(s=>`<option value="${escapeHTML(s.id)}">${escapeHTML(s.title)}</option>`).join('');$('toc').innerHTML=book.sections.map(s=>`<a href="#section-${escapeHTML(s.id)}" data-section="${escapeHTML(s.id)}">${escapeHTML(s.title)}</a>`).join('');$('article').innerHTML=`<div class="label">${escapeHTML(book.subtitle)}</div><h1>${escapeHTML(book.title)}</h1>`+book.sections.map(s=>`<section id="section-${escapeHTML(s.id)}"><h2>${escapeHTML(s.title)}</h2>${s.html}</section>`).join('');if(book.category==='使用指南')$('article').insertAdjacentHTML('beforeend','<nav class="guide-links" aria-label="其他使用指南">'+data.books.filter(b=>b.category==='使用指南'&&b.id!==book.id).map(b=>'<a href="#book/'+encodeURIComponent(b.id)+'">'+escapeHTML(b.title)+' ↗</a>').join('')+'</nav>');document.title='醫學加油站'}mountCalculatorWhenNeeded();mountDrugNamesWhenNeeded();mountSymptomSearch();window.scrollTo(0,0);$('article').focus({preventScroll:true});if(book&&match[2]){try{revealSearchTarget(decodeURIComponent(match[2]),normalizeSearch(new URLSearchParams(params).get('q')||''))}catch{}}}else{$('library').hidden=false;$('reader').hidden=true;document.title='醫學加油站';if(location.hash==='#collection')requestAnimationFrame(()=>$('collection').scrollIntoView());else window.scrollTo(0,0)}}
 $('toc').addEventListener('click',event=>{const link=event.target.closest('[data-section]');if(!link)return;event.preventDefault();$('section-'+link.dataset.section)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})});
 $('chapter-select').addEventListener('change',event=>{const id=event.target.value;if(!id)return;const section=$('section-'+id);if(!section)return;section.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});const heading=section.querySelector('h2');if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}});
 window.addEventListener('hashchange',route);
