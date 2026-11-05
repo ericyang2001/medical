@@ -372,3 +372,12 @@ article .abg-source-content .pdf-bold-highlight{padding:0}
 .abg-quiz-options input{flex-shrink:0;accent-color:#254d43}
 .abg-quiz-options label:focus-within{outline:2px solid #b48b48;outline-offset:2px}
 .abg-quiz-review li{margin-bottom:18px}.abg-quiz-review p{margin:6px 0}
+
+/* Floating iOS-inspired glass control, including iPhone safe-area spacing. */
+.back-to-top{position:fixed;right:calc(22px + env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:100;width:52px;height:52px;display:grid;place-items:center;padding:0;border:1px solid rgba(255,255,255,.72);border-radius:50%;color:#254d43;background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);box-shadow:0 6px 22px rgba(37,77,67,.12),inset 0 1px 1px rgba(255,255,255,.8);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .18s ease,background .18s ease,box-shadow .18s ease}
+.back-to-top:active{transform:scale(.92);background:rgba(255,255,255,.65)}
+.back-to-top:focus-visible{outline:3px solid #b48b48;outline-offset:4px}
+@media(hover:hover){.back-to-top:hover{background:rgba(255,255,255,.66);box-shadow:0 8px 26px rgba(37,77,67,.18),inset 0 1px 1px rgba(255,255,255,.85)}}
+@media(max-width:600px){.back-to-top{width:48px;height:48px;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.back-to-top{background:rgba(250,249,243,.94)}}
+@media(prefers-reduced-motion:reduce){.back-to-top{transition:none}}

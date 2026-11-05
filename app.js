@@ -290,3 +290,8 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
  showCounter(repeated ? readURL : incrementURL, !repeated);
 })();
 
+
+// Shared by the bookshelf and all reading pages; keep current quiz state intact.
+$('back-to-top').addEventListener('click',()=>{
+ window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+});
