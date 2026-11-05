@@ -407,5 +407,11 @@ header .header-actions .header-icon{display:grid;place-items:center;position:rel
 
 header .header-actions .header-icon svg{width:23px;height:23px}
 
-/* Mobile brand occupies the centered first row; navigation stays on row two. */
-@media(max-width:600px){header>.brand{flex:0 0 100%;justify-content:center}header .header-actions{margin-left:auto}}
+/* Mobile-only two-row header; desktop navigation remains unchanged. */
+@media(max-width:600px){
+ header{position:relative}
+ header>.brand{flex:0 0 calc(100% - 80px);justify-content:flex-start}
+ header .header-actions{flex:0 0 100%;justify-content:flex-end;margin-left:0}
+ header .header-actions .version-link{position:absolute;right:20px;top:20px;min-height:35px;display:flex;align-items:center;font-size:12px;padding:8px 0}
+ header .header-actions .header-icon svg{width:20px;height:20px}
+}
