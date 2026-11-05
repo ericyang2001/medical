@@ -406,3 +406,6 @@ header .header-actions .header-icon{display:grid;place-items:center;position:rel
 @media(max-width:600px){header{flex-wrap:wrap;gap:14px}header .header-actions{margin-left:auto;gap:7px}header .header-actions .version-link{display:block;font-size:13px}#version-page{padding:22px 18px;margin-top:20px}.version-content{font-size:16px}}
 
 header .header-actions .header-icon svg{width:23px;height:23px}
+
+/* Mobile brand occupies the centered first row; navigation stays on row two. */
+@media(max-width:600px){header>.brand{flex:0 0 100%;justify-content:center}header .header-actions{margin-left:auto}}

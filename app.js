@@ -170,29 +170,21 @@ $('toc').addEventListener('click',event=>{const link=event.target.closest('[data
 $('chapter-select').addEventListener('change',event=>{const id=event.target.value;if(!id)return;const section=$('section-'+id);if(!section)return;section.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});const heading=section.querySelector('h2,h3');if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}});
 window.addEventListener('hashchange',route);
 document.addEventListener('keydown',event=>{if(event.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('library').hidden){event.preventDefault();$('search').focus()}});
-function showDate(value){const date=new Date(value);if(Number.isNaN(date.getTime()))return;$('updated').dateTime=date.toISOString();$('updated').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(date).replaceAll('-','/');}
-showDate(data.updated);
-// Cache public update metadata for six hours; a new app version invalidates it.
+let latestSiteUpdate=0;
+function showDate(value){const date=new Date(value);if(Number.isNaN(date.getTime())||date.getTime()<latestSiteUpdate)return;latestSiteUpdate=date.getTime();$('updated').dateTime=date.toISOString();$('updated').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(date).replaceAll('-','/');}
+window.updateSiteDate=showDate;
+showDate($('updated').dateTime || data.updated);
+// Revalidate on every page load; do not let an old cached date hide an update.
 (async function updateDate(){
  if(location.hostname!=='ericyang2001.github.io')return;
- const key='medical-bookshelf:updated-date:v1';
- let cached;
- try{cached=JSON.parse(localStorage.getItem(key)||'null')}catch{}
- if(cached?.date)showDate(cached.date);
- const now=Date.now(),age=now-cached?.checkedAt;
- if(cached?.version===assetVersion&&age>=0&&age<6*60*60*1000)return;
- const controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),8000);
- let date=cached?.date || data.updated;
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);
  try{
-  const response=await fetch('https://api.github.com/repos/ericyang2001/medical/commits?sha=main&per_page=1',{headers:{Accept:'application/vnd.github+json'},signal:controller.signal});
+  const response=await fetch('https://api.github.com/repos/ericyang2001/medical/commits?sha=main&per_page=1',{cache:'no-store',headers:{Accept:'application/vnd.github+json'},signal:controller.signal});
   if(!response.ok)throw new Error('Date unavailable');
   const commits=await response.json();
   const latest=commits?.[0]?.commit?.committer?.date;
-  if(latest&&!Number.isNaN(new Date(latest).getTime()))date=latest;
+  if(latest)showDate(latest);
  }catch{}finally{clearTimeout(timeout)}
- showDate(date);
- try{localStorage.setItem(key,JSON.stringify({version:assetVersion,checkedAt:now,date}))}catch{}
 })();
 renderBooks();route();
 
