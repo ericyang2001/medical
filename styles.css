@@ -361,3 +361,14 @@ article .abg-source-content .pdf-bold-highlight{padding:0}
 .abg-practice-solution{margin-top:24px;padding-top:8px;border-top:1px solid #cdd7cc}
 .abg-practice-card [hidden]{display:none!important}
 @media(max-width:600px){.abg-practice-card{padding:16px}.abg-practice-actions button{width:100%}}
+
+
+.abg-practice-form fieldset{border:0;padding:0;margin:0;min-width:0}
+.abg-practice-form legend{font-weight:800;font-size:1.1em;margin-bottom:12px}
+.abg-quiz-progress{font-size:14px;color:#52634f}
+.abg-quiz-options{display:grid;gap:10px}
+.abg-quiz-options label{display:flex;align-items:baseline;gap:12px;margin:0;padding:14px;border:1px solid #cdd7cc;border-radius:12px;font-weight:400;cursor:pointer;line-height:1.6}
+.abg-quiz-options label:has(input:checked){background:#edf3e6;border-color:#254d43}
+.abg-quiz-options input{flex-shrink:0;accent-color:#254d43}
+.abg-quiz-options label:focus-within{outline:2px solid #b48b48;outline-offset:2px}
+.abg-quiz-review li{margin-bottom:18px}.abg-quiz-review p{margin:6px 0}
