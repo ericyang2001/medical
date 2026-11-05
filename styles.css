@@ -386,8 +386,7 @@ article .abg-source-content .pdf-bold-highlight{padding:0}
 header .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
 header .header-actions>a{border-bottom:0;margin:0}
 header .header-actions .version-link{display:block;font-size:14px;white-space:nowrap;color:var(--ink);padding:10px 6px}
-header .header-actions .header-glass{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;padding:0;border:1px solid rgba(255,255,255,.7);border-radius:50%;background:rgba(255,255,255,.4);color:var(--ink);box-shadow:0 4px 15px rgba(37,77,67,.08),inset 0 1px 1px #fff;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);cursor:pointer}
-header .header-actions .admin-icon{display:grid;place-items:center;position:relative;flex:0 0 40px;width:40px;height:42px;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;box-shadow:none}
+header .header-actions .header-icon{display:grid;place-items:center;position:relative;flex:0 0 40px;width:40px;height:42px;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;box-shadow:none}
 .admin-indicator{position:absolute;right:3px;top:4px;width:7px;height:7px;background:#467d57;border:2px solid #f8f6ef;border-radius:50%}
 .header-actions :focus-visible{outline:3px solid #b48b48;outline-offset:3px}
 #version-page{max-width:900px;margin:30px auto 80px;padding:28px 32px;border:1px solid #d7dece;border-radius:18px;background:#fffdf7}
@@ -404,4 +403,6 @@ header .header-actions .admin-icon{display:grid;place-items:center;position:rela
 #admin-dialog h2{margin:8px 0 20px;font-size:24px}#admin-password{box-sizing:border-box;width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid #b7c5b6;border-radius:10px;background:white;color:#254d43}#admin-submit{margin-top:20px;width:100%}
 #admin-dialog .dialog-close{position:absolute;top:12px;right:12px;width:36px;height:36px;border:0;background:transparent;color:#52634f;font-size:26px;cursor:pointer}
 #version-page [hidden],#admin-dialog [hidden],.admin-indicator[hidden]{display:none!important}
-@media(max-width:600px){header{flex-wrap:wrap;gap:14px}header .header-actions{margin-left:auto;gap:7px}header .header-actions .version-link{display:block;font-size:13px}header .header-actions .header-glass{width:40px;height:40px;flex-basis:40px}#version-page{padding:22px 18px;margin-top:20px}.version-content{font-size:16px}}
+@media(max-width:600px){header{flex-wrap:wrap;gap:14px}header .header-actions{margin-left:auto;gap:7px}header .header-actions .version-link{display:block;font-size:13px}#version-page{padding:22px 18px;margin-top:20px}.version-content{font-size:16px}}
+
+header .header-actions .header-icon svg{width:23px;height:23px}
