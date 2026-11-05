@@ -12,7 +12,7 @@ function getSearchIndex(){
  if(searchIndex)return searchIndex;
  searchIndex=shelfBooks.flatMap(book=>book.sections.map(section=>{
  const container=document.createElement('div');container.innerHTML=section.html;
- container.querySelectorAll('script,style').forEach(node=>node.remove());
+ container.querySelectorAll('script,style,.abg-practice-solution,.abg-practice-form,.abg-practice-intro').forEach(node=>node.remove());
  container.querySelectorAll('br').forEach(node=>node.replaceWith(' '));
  container.querySelectorAll('td,th,p,li,h3,h4').forEach(node=>node.append(' '));
  const text=container.textContent.replace(/\s+/g,' ').trim();
@@ -68,7 +68,7 @@ function revealSearchTarget(sectionId,query){
  let first=null;
  if(query){
   const walker=document.createTreeWalker(section,NodeFilter.SHOW_TEXT);const nodes=[];
-  while(walker.nextNode())if(!walker.currentNode.parentElement.closest('script,style,input,textarea,select,button'))nodes.push(walker.currentNode);
+  while(walker.nextNode())if(!walker.currentNode.parentElement.closest('script,style,input,textarea,select,button,.abg-practice-solution'))nodes.push(walker.currentNode);
   nodes.forEach(node=>{
    const text=node.textContent,lower=text.toLocaleLowerCase();let offset=0,at=lower.indexOf(query);if(at<0)return;
    const fragment=document.createDocumentFragment();
@@ -289,3 +289,30 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
  }
  showCounter(repeated ? readURL : incrementURL, !repeated);
 })();
+
+// ABG practice: each original solution remains hidden until a written attempt.
+$('article').addEventListener('input',event=>{
+ if(event.target.matches('.abg-practice-form textarea'))event.target.setCustomValidity('');
+});
+$('article').addEventListener('submit',event=>{
+ const form=event.target.closest('.abg-practice-form');if(!form)return;
+ event.preventDefault();
+ const field=form.querySelector('textarea');
+ if(!field.value.trim()){field.setCustomValidity('請先寫下自己的判讀，再查看詳解。');field.reportValidity();return}
+ field.setCustomValidity('');
+ const card=form.closest('.abg-practice-card'),solution=card.querySelector('.abg-practice-solution');
+ solution.hidden=false;field.readOnly=true;
+ const submit=form.querySelector('[type="submit"]');submit.setAttribute('aria-expanded','true');submit.hidden=true;
+ form.querySelector('.abg-practice-reset').hidden=false;
+ form.querySelector('.abg-practice-status').textContent='已完成，可對照下方詳解';
+ solution.setAttribute('tabindex','-1');solution.focus({preventScroll:true});
+ solution.scrollIntoView({block:'nearest',behavior:'instant'});
+});
+$('article').addEventListener('click',event=>{
+ const reset=event.target.closest('.abg-practice-reset');if(!reset)return;
+ const form=reset.closest('form'),field=form.querySelector('textarea');
+ form.reset();field.readOnly=false;field.setCustomValidity('');
+ form.closest('.abg-practice-card').querySelector('.abg-practice-solution').hidden=true;
+ const submit=form.querySelector('[type="submit"]');submit.hidden=false;submit.setAttribute('aria-expanded','false');
+ reset.hidden=true;form.querySelector('.abg-practice-status').textContent='';field.focus();
+});

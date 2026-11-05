@@ -345,3 +345,19 @@ article .abg-source-table{font-size:17px;min-width:820px;table-layout:auto}
 article .abg-source-table th,article .abg-source-table td{overflow-wrap:normal;word-break:normal;hyphens:none}
 article .abg-source-content .pdf-bold-highlight{padding:0}
 @media(max-width:600px){article .abg-source-table{font-size:16px}}
+
+/* ABG written practice and source answer reveal. */
+.abg-practice-card{margin:28px 0;padding:24px;border:1px solid #cdd7cc;border-radius:16px;background:#fffdf7}
+.abg-practice-card h3{margin-top:0}
+.abg-practice-data{padding:2px 16px;margin:16px 0;background:#eef2e9;border-radius:10px}
+.abg-practice-form label{display:block;margin:18px 0 10px;font-weight:900}
+.abg-practice-form textarea{display:block;box-sizing:border-box;width:100%;resize:vertical;min-height:150px;border:1px solid #b7c5b6;border-radius:12px;padding:14px;background:#fff;color:#254d43;font:inherit;font-size:16px;line-height:1.8}
+.abg-practice-form textarea:focus-visible,.abg-practice-actions button:focus-visible{outline:3px solid #b48b48;outline-offset:3px}
+.abg-practice-form textarea[readonly]{background:#f3f4ed}
+.abg-practice-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.abg-practice-actions button{border:1px solid #254d43;border-radius:999px;padding:12px 20px;background:#254d43;color:#fffdf7;font:inherit;font-size:16px;cursor:pointer}
+.abg-practice-actions .abg-practice-reset{color:#254d43;background:#edf1e8;border-color:#cdd7cc}
+.abg-practice-status{font-size:14px;color:#52634f}
+.abg-practice-solution{margin-top:24px;padding-top:8px;border-top:1px solid #cdd7cc}
+.abg-practice-card [hidden]{display:none!important}
+@media(max-width:600px){.abg-practice-card{padding:16px}.abg-practice-actions button{width:100%}}
