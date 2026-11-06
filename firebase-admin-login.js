@@ -1,9 +1,9 @@
 // 此模組只處理 Firebase Google 身分驗證；是否為管理員以後端核發 Session 為準。
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import {
   initializeAuth, browserSessionPersistence, browserPopupRedirectResolver,
   GoogleAuthProvider, signInWithPopup, signOut
-} from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js';
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import { firebaseConfig } from './firebase-public-config.js';
 
 const required=['apiKey','authDomain','projectId','appId'];
