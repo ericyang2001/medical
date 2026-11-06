@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <title>Firebase UID 測試</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f8fa;
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .card {
+      background: white;
+      max-width: 440px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px #0001;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #4285F4;
+      color: white;
+      font-size: 15px;
+    }
+
+    #result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Google 管理員登入測試</h2>
+    <p>登入後取得 Firebase UID</p>
+
+    <button id="loginBtn">
+      使用 Google 帳號登入
+    </button>
+
+    <div id="result">尚未登入</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from
+      "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      onAuthStateChanged
+    } from
+      "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+
+    // 請替換成你自己的 Firebase 設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsynZMDxCHeBtEEGj2osWF7LIb1EYVedE",
+      authDomain: "medical-website-597a0.firebaseapp.com",
+      projectId: "medical-website-597a0",
+      storageBucket: "medical-website-597a0.firebasestorage.app",
+      messagingSenderId: "660460316942",
+      appId: "1:660460316942:web:71d1e78cccf73ccc054f5f",
+      measurementId: "G-E2H4C7C0XY"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const result =
+      document.getElementById("result");
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account"
+    });
+
+    document.getElementById("loginBtn")
+      .addEventListener("click", async () => {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (error) {
+          result.textContent =
+            "登入失敗：" + error.code;
+        }
+      });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        result.textContent =
+          "登入成功！\n\n" +
+          "Email: " + user.email + "\n\n" +
+          "Firebase UID:\n" + user.uid;
+      } else {
+        result.textContent = "尚未登入";
+      }
+    });
+  </script>
+</body>
+</html>
