@@ -3,10 +3,11 @@
 // 實際資料取代 REPLACE_WITH_*；勿填入 Service Account 私鑰／OAuth Client Secret。
 // 目前為安全的未設定範本，設定前 Google 管理員登入按鈕會停用。
 export const firebaseConfig = {
-  apiKey: 'REPLACE_WITH_API_KEY',
-  authDomain: 'REPLACE_WITH_AUTH_DOMAIN',
-  projectId: 'REPLACE_WITH_PROJECT_ID',
-  appId: 'REPLACE_WITH_APP_ID',
-  messagingSenderId: 'REPLACE_WITH_SENDER_ID',
-  storageBucket: 'REPLACE_WITH_STORAGE_BUCKET'
+  apiKey: "AIzaSyBsynZMDxCHeBtEEGj2osWF7LIb1EYVedE",
+  authDomain: "medical-website-597a0.firebaseapp.com",
+  projectId: "medical-website-597a0",
+  storageBucket: "medical-website-597a0.firebasestorage.app",
+  messagingSenderId: "660460316942",
+  appId: "1:660460316942:web:71d1e78cccf73ccc054f5f",
+  measurementId: "G-E2H4C7C0XY"
 };
