@@ -426,3 +426,16 @@ header .header-actions .header-icon svg{width:23px;height:23px}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#admin-google-login{background:#fffdf7}}
 @media(prefers-reduced-transparency:reduce){#admin-google-login{background:#fffdf7;backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media(prefers-reduced-motion:reduce){#admin-google-login{transition:none}}
+
+
+/* Administrator console: private data is provided only by authenticated APIs. */
+header .header-actions .console-link[hidden],#console-page[hidden],#console-page [hidden]{display:none!important}
+#console-page{max-width:1000px;margin:30px auto 80px;padding:28px 32px;border:1px solid #d7dece;border-radius:18px;background:#fffdf7}
+.console-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.console-heading h1{font-size:30px;margin:10px 0}
+#console-updated,.console-note{color:var(--muted);font-size:14px;line-height:1.8}
+#console-status:empty,#console-updated:empty{display:none}
+.console-tabs{display:flex;gap:10px;margin:22px 0;flex-wrap:wrap}.console-tabs a,#console-page button{font:inherit;padding:10px 18px;border:1px solid #cdd7cc;border-radius:12px;background:#edf1e8;color:var(--ink);cursor:pointer}.console-tabs a.active{background:var(--ink);color:#fffdf7}
+.console-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.console-cards>div{padding:24px 18px;border:1px solid #d7dece;border-radius:16px;background:#f5f6ee}.console-cards h2{font-size:16px;margin:0 0 12px}.console-cards strong{font-size:36px;font-variant-numeric:tabular-nums}
+#console-page table{width:100%;border-collapse:collapse;text-align:left}#console-page th,#console-page td{padding:14px;border-bottom:1px solid #dedfd3}#console-page td:last-child{overflow-wrap:anywhere}#console-page button:disabled{opacity:.5;cursor:wait}
+#console-page :focus-visible{outline:3px solid #b48b48;outline-offset:3px}
+@media(max-width:600px){#console-page{padding:22px 18px;margin-top:20px}.console-cards{grid-template-columns:1fr}.console-heading h1{font-size:26px}header:has(.console-link:not([hidden]))>.brand{flex-basis:calc(100% - 120px)}header:has(.console-link:not([hidden])) .version-link{right:62px}header .header-actions .console-link{position:absolute;right:16px;top:23px;width:36px;height:35px}#console-page th,#console-page td{padding:12px 8px;font-size:14px}}

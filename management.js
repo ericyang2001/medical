@@ -9,7 +9,7 @@
  let token='',authenticated=false,record=null,editing=false,saving=false,loading=null;
  try{token=sessionStorage.getItem('medical-firebase-admin-prod-session-v1')||''}catch{}
  const status=message=>{byId('version-status').textContent=message};
- function authUI(){byId('version-edit').hidden=!OFFICIAL_SITE||!authenticated||!record||editing;byId('admin-login').setAttribute('aria-label',authenticated?'管理者帳號':'管理者登入');byId('admin-login').title=authenticated?'管理者帳號':'管理者登入';byId('admin-login').querySelector('.admin-indicator').hidden=!authenticated;byId('admin-form').hidden=authenticated;byId('admin-account').hidden=!authenticated;byId('admin-dialog-title').textContent=authenticated?'管理者Eric已登入，歡迎~':'管理者登入';byId('version-save').disabled=!authenticated||saving}
+ function authUI(){byId('console-link').hidden=!authenticated;byId('version-edit').hidden=!OFFICIAL_SITE||!authenticated||!record||editing;byId('admin-login').setAttribute('aria-label',authenticated?'管理者帳號':'管理者登入');byId('admin-login').title=authenticated?'管理者帳號':'管理者登入';byId('admin-login').querySelector('.admin-indicator').hidden=!authenticated;byId('admin-form').hidden=authenticated;byId('admin-account').hidden=!authenticated;byId('admin-dialog-title').textContent=authenticated?'管理者Eric已登入，歡迎~':'管理者登入';byId('version-save').disabled=!authenticated||saving;window.dispatchEvent(new Event('medical-admin-state'))}
  function setSession(value){token=value;authenticated=!!value;try{if(value)sessionStorage.setItem('medical-firebase-admin-prod-session-v1',value);else sessionStorage.removeItem('medical-firebase-admin-prod-session-v1')}catch{}authUI()}
  async function request(path,options={}){
   if(path==='/versions'&&options.method==='PUT'&&!OFFICIAL_SITE)
@@ -17,6 +17,11 @@
   let res;try{res=await fetch(API+path,{...options,cache:'no-store',headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{}),...options.headers}})}catch{throw new Error('無法連線，請確認網路後再試。')}let data;try{data=await res.json()}catch{throw new Error('服務暫時無法使用，請稍後再試。')}if(!res.ok){if(res.status===401&&path!=='/auth/firebase')setSession('');throw new Error(data.error||'操作失敗，請稍後再試。')}return data}
  function draw(){if(!record)return;if(record.updatedAt)window.updateSiteDate?.(record.updatedAt);byId('version-content').textContent=record.content;byId('version-updated').textContent=record.updatedAt?'最後更新：'+new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(record.updatedAt)):'';authUI()}
  async function load(){if(editing)return;if(loading)return loading;byId('version-retry').hidden=true;status('載入中…');loading=(async()=>{try{record=await request('/versions');draw();status('')}catch(e){status(e.message);byId('version-retry').hidden=false}finally{loading=null}})();return loading}
+ window.medicalConsoleAccess={authenticated:()=>authenticated,request:path=>{
+  if(!authenticated)return Promise.reject(new Error('請先登入管理者。'));
+  if(!/^\/admin\/(overview|login-records)(\?before=\d+)?$/.test(path))return Promise.reject(new Error('不支援的控制台請求。'));
+  return request(path);
+ }};
  window.renderVersionHistory=load;
  byId('version-retry').addEventListener('click',load);
  byId('version-edit').addEventListener('click',()=>{if(!OFFICIAL_SITE||!authenticated||!record)return;editing=true;byId('version-draft').value=record.content;byId('version-content').hidden=true;byId('version-form').hidden=false;status('');authUI();byId('version-draft').focus()});
@@ -68,3 +73,4 @@
  load();
  authUI();if(token)request('/session').then(()=>{authenticated=true;authUI()}).catch(()=>{setSession('')});
 })();
+
