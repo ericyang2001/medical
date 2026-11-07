@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>醫學加油站｜正式 Google 登入隔離驗收</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color-scheme:light}
+body{background:#f6f8fb;color:#182536;margin:0;padding:32px 16px}
+main{max-width:640px;margin:0 auto;background:white;border:1px solid #dde3eb;border-radius:16px;padding:24px;box-shadow:0 6px 24px #1122330c}
+h1{font-size:1.4rem}p{line-height:1.7}button{padding:12px 16px;background:#245b96;color:white;border:0;border-radius:9px;margin:4px 8px 4px 0;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}#out{padding:16px;border-radius:10px;background:#f1f5fa;white-space:pre-wrap;overflow-wrap:anywhere}
+small{color:#56677c}
+</style>
+</head>
+<body>
+<main>
+<h1>醫學加油站｜正式登入隔離驗收</h1>
+<p>此頁只連接 <code>medical-auth-v2-prod</code>，僅測試 Google 登入、Session 及登出。不含版本紀錄編輯、PUT 或其他資料修改功能。</p>
+<p><small>注意：登入後會在正式 D1 新增管理員 Session，登出則撤銷該 Session。請只在可信任、已設定 Firebase Authorized domains 及 Worker CORS 的獨立 HTTPS 網域測試。</small></p>
+<button id="login" disabled>使用 Google 帳號登入</button>
+<button id="check" disabled>檢查 Session</button>
+<button id="logout" disabled>登出並撤銷 Session</button>
+<p id="out" role="status" aria-live="polite">載入 Firebase 中…</p>
+</main>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+import { initializeAuth, browserSessionPersistence, browserPopupRedirectResolver, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import { firebaseConfig } from './firebase-public-config.js';
+
+const API='https://medical-auth-v2-prod.eric20011230.workers.dev/api';
+const $=id=>document.getElementById(id);
+const say=message=>{$('out').textContent=message};
+let auth=null;
+let sessionToken='';
+function controls(busy=false){
+ $('login').disabled=busy||!auth||!!sessionToken;
+ $('check').disabled=busy||!sessionToken;
+ $('logout').disabled=busy||!sessionToken;
+}
+async function call(path, method='GET', body){
+ const response=await fetch(API+path,{
+  method, mode:'cors',cache:'no-store',
+  headers:{...(body?{'Content-Type':'application/json'}:{}),...(sessionToken?{'Authorization':'Bearer '+sessionToken}:{})},
+  ...(body?{body:JSON.stringify(body)}:{})
+ });
+ let data={};try{data=await response.json()}catch{}
+ if(!response.ok)throw new Error('HTTP '+response.status+'：'+(data.error||'請求遭拒絕'));
+ return data;
+}
+try{
+ const app=initializeApp(firebaseConfig,'medical-prod-isolated-test');
+ auth=initializeAuth(app,{persistence:browserSessionPersistence,popupRedirectResolver:browserPopupRedirectResolver});
+ say('測試頁已載入。請使用指定管理員 Google 帳號登入。');
+}catch(e){say('Firebase 初始化失敗：'+(e?.code||e?.message||'未知錯誤'))}
+controls();
+$('login').addEventListener('click',async()=>{
+ controls(true);say('正在透過 Firebase 登入…');
+ try{
+  const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+  const credential=await signInWithPopup(auth,provider);
+  const idToken=await credential.user.getIdToken();
+  const response=await call('/auth/firebase','POST',{idToken});
+  if(typeof response.token!=='string'||!response.token)throw new Error('後端未回傳 Session token');
+  sessionToken=response.token;
+  say('正式 Worker 已接受 Firebase 登入並核發 Session。請按「檢查 Session」驗證。');
+ }catch(e){say('登入失敗：'+(e?.code||e?.message||'未知錯誤'));try{await signOut(auth)}catch{}}
+ finally{controls()}
+});
+$('check').addEventListener('click',async()=>{
+ controls(true);say('檢查 Session 中…');
+ try{
+  await call('/session');
+  say('Session API 驗證成功（HTTP 2xx）。');
+ }catch(e){say('Session 驗證失敗：'+e.message)}
+ finally{controls()}
+});
+$('logout').addEventListener('click',async()=>{
+ controls(true);say('登出中…');
+ try{
+  await call('/logout','POST');
+  sessionToken='';
+  await signOut(auth);
+  say('正式後端 Session 已撤銷，Firebase 亦已登出。');
+ }catch(e){say('登出未確認成功：'+e.message+'。請勿將此狀態視為已撤銷 Session。')}
+ finally{controls()}
+});
+window.addEventListener('pagehide',()=>{sessionToken=''});
+</script>
+</body>
+</html>
