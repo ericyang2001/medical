@@ -387,7 +387,8 @@ header .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:nowrap
 header .header-actions>a{border-bottom:0;margin:0}
 header .header-actions .version-link{display:block;font-size:14px;white-space:nowrap;color:var(--ink);padding:10px 6px}
 header .header-actions .header-icon{display:grid;place-items:center;position:relative;flex:0 0 40px;width:40px;height:42px;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;box-shadow:none}
-.admin-indicator{position:absolute;right:3px;top:4px;width:7px;height:7px;background:#467d57;border:2px solid #f8f6ef;border-radius:50%}
+.admin-indicator{position:absolute;right:0;top:1px;width:15px;height:15px;color:#467d57;pointer-events:none}
+header .header-actions .header-icon .admin-indicator svg{display:block;width:15px;height:15px;filter:drop-shadow(0 1px 1px #f8f6ef)}
 .header-actions :focus-visible{outline:3px solid #b48b48;outline-offset:3px}
 #version-page{max-width:900px;margin:30px auto 80px;padding:28px 32px;border:1px solid #d7dece;border-radius:18px;background:#fffdf7}
 .version-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.version-heading h1{font-size:30px;margin:10px 0}.version-updated,.version-hint{color:var(--muted);font-size:14px}
@@ -415,3 +416,13 @@ header .header-actions .header-icon svg{width:23px;height:23px}
  header .header-actions .version-link{position:absolute;right:20px;top:20px;min-height:35px;display:flex;align-items:center;font-size:12px;padding:8px 0}
  header .header-actions .header-icon svg{width:20px;height:20px}
 }
+
+/* Google-only glass sign-in control; keeps the existing dialog and header layout. */
+#admin-google-login{display:grid;place-items:center;width:56px;height:56px;margin:8px auto;padding:0;border:1px solid rgba(255,255,255,.85);border-radius:18px;background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);box-shadow:0 5px 18px rgba(37,77,67,.10),inset 0 1px 1px rgba(255,255,255,.9);touch-action:manipulation;transition:transform .18s ease,background .18s ease}
+#admin-google-login .google-login-logo{display:block;width:24px;height:24px}
+#admin-google-login:focus-visible{outline:3px solid #b48b48;outline-offset:4px}
+#admin-google-login:active:not(:disabled){transform:scale(.94)}
+@media(hover:hover){#admin-google-login:hover:not(:disabled){background:rgba(255,255,255,.75)}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#admin-google-login{background:#fffdf7}}
+@media(prefers-reduced-transparency:reduce){#admin-google-login{background:#fffdf7;backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){#admin-google-login{transition:none}}
