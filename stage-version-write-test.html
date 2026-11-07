@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>醫學加油站｜Staging 版本紀錄驗收</title>
+<style>
+body{margin:0;padding:28px 14px;background:#f5f7fa;color:#1b2939;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
+main{max-width:720px;margin:auto;background:#fff;border:1px solid #dce4eb;border-radius:16px;padding:24px}
+h1{font-size:1.4rem}p{line-height:1.65}button{padding:10px 14px;border-radius:9px;border:0;background:#20588b;color:white;cursor:pointer;margin:4px 6px 4px 0}
+button:disabled{opacity:.43;cursor:not-allowed}
+textarea{width:100%;min-height:170px;box-sizing:border-box;padding:12px;border:1px solid #bfcad7;border-radius:8px;font:inherit}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef3f8;padding:14px;border-radius:9px}
+small{color:#586679}strong{color:#144a7d}
+</style></head><body><main>
+<h1>醫學加油站｜Staging 版本紀錄驗收</h1>
+<p>限定測試後端 <strong>medical-auth-v2-stage</strong>，連接獨立 D1 <strong>medical-versions-v2-stage</strong>。本頁不會呼叫正式 Worker。</p>
+<p><small>先執行「讀取 Staging 紀錄」。確認資料符合預期後，再登入測試。只有主動按下「儲存到 Staging」才會發出版本紀錄 PUT 請求。</small></p>
+<button id="read">讀取 Staging 紀錄</button>
+<button id="login" disabled>Google 管理員登入（Staging）</button>
+<button id="logout" disabled>登出</button>
+<p id="status" role="status" aria-live="polite">等待讀取 Staging 資料。</p>
+<section id="record" hidden><p>Revision：<strong id="rev"></strong>　更新時間：<span id="updated"></span></p>
+<pre id="current"></pre>
+<button id="edit" disabled>開始編輯測試資料</button>
+<div id="editor" hidden>
+<label for="draft">Staging 測試內容（僅會修改 Staging D1）</label>
+<textarea id="draft"></textarea>
+<p><button id="save">儲存到 Staging</button><button id="cancel">取消</button></p>
+</div></section>
+</main><script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+import { initializeAuth, browserSessionPersistence, browserPopupRedirectResolver, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import { firebaseConfig } from './firebase-public-config.js';
+const API='https://medical-auth-v2-stage.eric20011230.workers.dev/api';
+const $=id=>document.getElementById(id);
+let auth, session='', record=null, busy=false;
+const say=m=>{$('status').textContent=m};
+const buttons=()=>{$('read').disabled=busy;$('login').disabled=busy||!auth||!!session||!record;$('logout').disabled=busy||!session;$('edit').disabled=busy||!session||!record;$('save').disabled=busy||!session};
+async function request(path,method='GET',body){
+ const response=await fetch(API+path,{method,mode:'cors',cache:'no-store',headers:{...(body?{'Content-Type':'application/json'}:{}),...(session?{Authorization:'Bearer '+session}:{})},...(body?{body:JSON.stringify(body)}:{})});
+ let result={};try{result=await response.json()}catch{}
+ if(!response.ok)throw new Error('HTTP '+response.status+'：'+(result.error||'API 回應失敗'));
+ return result;
+}
+function draw(){if(!record)return;$('record').hidden=false;$('rev').textContent=String(record.revision);$('updated').textContent=String(record.updatedAt||'');$('current').textContent=record.content;buttons()}
+async function run(task){busy=true;buttons();try{await task()}catch(e){say('操作失敗：'+(e.code||e.message||String(e)))}finally{busy=false;buttons()}}
+try{
+ const app=initializeApp(firebaseConfig,'medical-stage-version-editor-verification');
+ auth=initializeAuth(app,{persistence:browserSessionPersistence,popupRedirectResolver:browserPopupRedirectResolver});
+}catch(e){say('Firebase 初始化失敗：'+e.message)}
+buttons();
+$('read').onclick=()=>run(async()=>{record=await request('/versions');if(typeof record.content!=='string'||!Number.isInteger(record.revision))throw new Error('版本紀錄資料格式不符');draw();say('已成功讀取 Staging。請核對內容及 revision 後再登入。')});
+$('login').onclick=()=>run(async()=>{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});const credential=await signInWithPopup(auth,provider);const result=await request('/auth/firebase','POST',{idToken:await credential.user.getIdToken()});if(!result.token)throw new Error('未取得後端 Session');session=result.token;await request('/session');say('Staging 管理員登入及 Session 驗證成功。')});
+$('edit').onclick=()=>{$('draft').value=record.content;$('editor').hidden=false;say('編輯只在此頁暫存；按「儲存到 Staging」才會修改測試資料。')};
+$('cancel').onclick=()=>{$('editor').hidden=true;say('已取消編輯，沒有寫入資料。')};
+$('save').onclick=()=>run(async()=>{
+ if(!record||!session)throw new Error('必須先登入並讀取測試資料');
+ if(!confirm('確定要修改 medical-versions-v2-stage 的版本紀錄嗎？正式 D1 不會受影響。'))return;
+ const content=$('draft').value;
+ const next=await request('/versions','PUT',{content,revision:record.revision});
+ if(typeof next.content!=='string'||!Number.isInteger(next.revision))throw new Error('儲存回應格式不符，請重新讀取確認');
+ record=next;draw();$('editor').hidden=true;say('Staging 儲存成功。請重新讀取驗證資料。');
+});
+$('logout').onclick=()=>run(async()=>{await request('/logout','POST');session='';await signOut(auth);$('editor').hidden=true;say('已登出並撤銷 Staging Session。')});
+window.addEventListener('pagehide',()=>{session=''});
+</script></body></html>
