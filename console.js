@@ -6,7 +6,38 @@
  function clearPrivateData() {
   ['console-today','console-week','console-month'].forEach(id => $(id).textContent='—');
   $('console-login-rows').replaceChildren(); $('console-updated').textContent='';
+  $('console-daily-chart').replaceChildren(); $('console-chart-note').textContent=''; $('console-chart-range').textContent='近期每日趨勢';
   $('console-more').hidden=true; cursor=null;
+ }
+
+ function drawDailyChart(data) {
+  const target=$('console-daily-chart'), note=$('console-chart-note');
+  target.replaceChildren();note.textContent='';
+  const raw=[data.daily,data.dailyVisits,data.dailyCounts,data.dailyVisitors].find(Array.isArray);
+  const rows=(raw||[]).map(item=>{
+   if(!item||typeof item!=='object')return null;
+   const day=String(item.date??item.day??item.dayDate??'');
+   const amount=Number(item.count??item.visitors??item.visits??item.total);
+   return /^\\d{4}-\\d{2}-\\d{2}$/.test(day)&&Number.isFinite(amount)&&amount>=0?{day,count:Math.floor(amount)}:null;
+  }).filter(Boolean).sort((a,b)=>a.day.localeCompare(b.day)).slice(-14);
+  if(!rows.length){
+   const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).replace(/\\//g,'-');
+   rows.push({day:today,count:Math.max(0,Number(data.today)||0)});
+   note.textContent='目前 API 僅提供今日、週、月總數；圖表先顯示今日實際數值。完整每日趨勢需後端提供每日歷史明細。';
+   $('console-chart-range').textContent='今日';
+  }else{$('console-chart-range').textContent=rows.length+' 日趨勢';}
+  const maximum=Math.max(1,...rows.map(x=>x.count));
+  const plot=document.createElement('div');plot.className='console-chart-bars';
+  for(const item of rows){
+   const column=document.createElement('div');column.className='console-chart-column';
+   const value=document.createElement('span');value.className='console-chart-value';value.textContent=item.count.toLocaleString('zh-TW');
+   const track=document.createElement('div');track.className='console-chart-track';
+   const bar=document.createElement('div');bar.className='console-chart-bar';bar.style.height=(item.count===0?0:Math.max(5,item.count/maximum*100))+'%';
+   const caption=document.createElement('span');caption.className='console-chart-day';caption.textContent=item.day.slice(5).replace('-','/');
+   column.title=item.day+'：'+item.count+' 人';track.append(bar);column.append(value,track,caption);plot.append(column);
+  }
+  target.append(plot);
+  target.setAttribute('aria-label','每日瀏覽人數：'+rows.map(x=>x.day+' '+x.count+' 人').join('、'));
  }
  function updateAccess() {
   generation++; loading=false; clearPrivateData();$('console-refresh').disabled=false;$('console-more').disabled=false;
@@ -27,6 +58,7 @@
    if(current!==generation||!window.medicalConsoleAccess.authenticated())return;
    if(selected==='overview'){
     for(const [id,key] of [['console-today','today'],['console-week','week'],['console-month','month']])$(id).textContent=Number(data[key]||0).toLocaleString('zh-TW');
+    drawDailyChart(data);
    }else{
     if(!append)$('console-login-rows').replaceChildren();
     for(const item of data.items){
