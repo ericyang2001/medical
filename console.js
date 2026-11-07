@@ -18,10 +18,10 @@
    if(!item||typeof item!=='object')return null;
    const day=String(item.date??item.day??item.dayDate??'');
    const amount=Number(item.count??item.visitors??item.visits??item.total);
-   return /^\\d{4}-\\d{2}-\\d{2}$/.test(day)&&Number.isFinite(amount)&&amount>=0?{day,count:Math.floor(amount)}:null;
+   return /^\d{4}-\d{2}-\d{2}$/.test(day)&&Number.isFinite(amount)&&amount>=0?{day,count:Math.floor(amount)}:null;
   }).filter(Boolean).sort((a,b)=>a.day.localeCompare(b.day)).slice(-14);
   if(!rows.length){
-   const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).replace(/\\//g,'-');
+   const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
    rows.push({day:today,count:Math.max(0,Number(data.today)||0)});
    note.textContent='目前 API 僅提供今日、週、月總數；圖表先顯示今日實際數值。完整每日趨勢需後端提供每日歷史明細。';
    $('console-chart-range').textContent='今日';
