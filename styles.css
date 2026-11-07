@@ -387,7 +387,7 @@ header .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:nowrap
 header .header-actions>a{border-bottom:0;margin:0}
 header .header-actions .version-link{display:block;font-size:14px;white-space:nowrap;color:var(--ink);padding:10px 6px}
 header .header-actions .header-icon{display:grid;place-items:center;position:relative;flex:0 0 40px;width:40px;height:42px;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;box-shadow:none}
-.admin-indicator{position:absolute;right:0;top:1px;width:15px;height:15px;color:#467d57;pointer-events:none}
+.admin-indicator{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);width:15px;height:15px;color:#467d57;pointer-events:none}
 header .header-actions .header-icon .admin-indicator svg{display:block;width:15px;height:15px;filter:drop-shadow(0 1px 1px #f8f6ef)}
 .header-actions :focus-visible{outline:3px solid #b48b48;outline-offset:3px}
 #version-page{max-width:900px;margin:30px auto 80px;padding:28px 32px;border:1px solid #d7dece;border-radius:18px;background:#fffdf7}
