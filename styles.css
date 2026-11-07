@@ -439,3 +439,27 @@ header .header-actions .console-link[hidden],#console-page[hidden],#console-page
 #console-page table{width:100%;border-collapse:collapse;text-align:left}#console-page th,#console-page td{padding:14px;border-bottom:1px solid #dedfd3}#console-page td:last-child{overflow-wrap:anywhere}#console-page button:disabled{opacity:.5;cursor:wait}
 #console-page :focus-visible{outline:3px solid #b48b48;outline-offset:3px}
 @media(max-width:600px){#console-page{padding:22px 18px;margin-top:20px}.console-cards{grid-template-columns:1fr}.console-heading h1{font-size:26px}header:has(.console-link:not([hidden]))>.brand{flex-basis:calc(100% - 120px)}header:has(.console-link:not([hidden])) .version-link{right:62px}header .header-actions .console-link{position:absolute;right:16px;top:23px;width:36px;height:35px}#console-page th,#console-page td{padding:12px 8px;font-size:14px}}
+
+/* Console update 2026-11-07: glass refresh, keyboard tabs, daily visitors chart. */
+#console-page .console-glass-refresh{width:44px;height:44px;min-width:44px;display:inline-grid;place-items:center;padding:0;border:1px solid rgba(255,255,255,.75);border-radius:14px;background:rgba(255,255,255,.38);color:var(--ink);box-shadow:0 2px 12px rgba(35,65,55,.10),inset 0 1px 0 rgba(255,255,255,.8);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);transition:background .18s,transform .18s,box-shadow .18s}
+#console-page .console-glass-refresh:hover:not(:disabled){background:rgba(255,255,255,.68);box-shadow:0 4px 16px rgba(35,65,55,.16)}
+#console-page .console-glass-refresh:active:not(:disabled){transform:scale(.95)}
+.console-tabs{gap:10px;margin:20px 0 24px}
+#console-page .console-tabs a{display:inline-flex;justify-content:center;align-items:center;min-height:44px;padding:10px 20px;border:1px solid #c8cfc4;border-bottom:3px solid #a7b1a4;border-radius:10px;background:linear-gradient(180deg,#fffefa,#e9ede5);box-shadow:0 3px 0 rgba(47,66,52,.15),0 5px 9px rgba(47,66,52,.08);color:var(--ink);font-weight:650;text-decoration:none;transition:transform .15s,box-shadow .15s}
+#console-page .console-tabs a:hover{background:linear-gradient(180deg,#fff,#f2f4ed)}
+#console-page .console-tabs a.active{background:linear-gradient(180deg,#d9e4d9,#c8d7cb);color:var(--ink);border-bottom-color:#758d7b;box-shadow:0 1px 1px rgba(47,66,52,.12),inset 0 2px 5px rgba(47,66,52,.09);transform:translateY(2px)}
+.console-chart-panel{margin-top:22px;padding:20px 20px 18px;border:1px solid #d7dece;border-radius:16px;background:#fafbf6}
+.console-chart-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.console-chart-heading h2{font-size:18px;margin:0}.console-chart-heading span{font-size:13px;color:var(--muted)}
+.console-daily-chart{overflow-x:auto;padding:8px 0 4px}.console-chart-bars{display:flex;align-items:stretch;gap:8px;min-height:215px}
+.console-chart-column{flex:1 0 30px;min-width:30px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.console-chart-value{font-size:12px;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.console-chart-track{height:150px;width:100%;max-width:48px;display:flex;align-items:end;justify-content:center;border-bottom:1px solid #afbeaf}
+.console-chart-bar{width:74%;min-height:0;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#6c9c8e,#34594d)}
+.console-chart-day{font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+#console-chart-note:empty{display:none}#console-chart-note{margin:12px 0 0}
+.console-updated-bottom{margin:26px 0 0;padding-top:14px;border-top:1px solid #e0e5db;text-align:right}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#console-page .console-glass-refresh{background:#f8faf7}}
+@media(prefers-reduced-transparency:reduce){#console-page .console-glass-refresh{background:#f8faf7;backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){#console-page .console-glass-refresh,#console-page .console-tabs a{transition:none}}
+@media(max-width:600px){.console-chart-panel{padding:16px 12px}.console-chart-bars{gap:6px}.console-chart-column{flex-basis:30px}.console-tabs a{flex:1 1 auto}}
