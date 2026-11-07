@@ -1,41 +1,34 @@
 'use strict';
 (()=>{
- const PUBLIC_API='https://medical-version-service.ericccy1230.chatgpt.site/api';
- // Staging admin operations must NEVER contact the production backend.
- const candidate=String(window.MEDICAL_ADMIN_STAGING_API||'').trim().replace(/\/+$/,'');
- let STAGING_API='';
- try{
-  const url=new URL(candidate);
-  if(url.protocol==='https:'&&url.username===''&&url.password===''&&
-     !url.search&&!url.hash&&url.origin!==new URL(PUBLIC_API).origin&&
-     url.pathname.endsWith('/api')) STAGING_API=url.href.replace(/\/+$/,'');
- }catch{}
+ // Release candidate: all admin requests use self-managed production Worker.
+ const API='https://medical-auth-v2-prod.eric20011230.workers.dev/api';
+ // Frontend preview deployments must never write production version history.
+ // The Worker remains responsible for enforcing authentication and authorization.
+ const OFFICIAL_SITE=location.origin==='https://ericyang2001.github.io';
  const byId=id=>document.getElementById(id);
  let token='',authenticated=false,record=null,editing=false,saving=false,loading=null;
- try{token=sessionStorage.getItem('medical-firebase-admin-session-v1')||''}catch{}
+ try{token=sessionStorage.getItem('medical-firebase-admin-prod-session-v1')||''}catch{}
  const status=message=>{byId('version-status').textContent=message};
- function authUI(){byId('version-edit').hidden=!authenticated||!record||editing;byId('admin-login').setAttribute('aria-label',authenticated?'管理者帳號':'管理者登入');byId('admin-login').title=authenticated?'管理者帳號':'管理者登入';byId('admin-login').querySelector('.admin-indicator').hidden=!authenticated;byId('admin-form').hidden=authenticated;byId('admin-account').hidden=!authenticated;byId('admin-dialog-title').textContent=authenticated?'管理者帳號':'管理者登入';byId('version-save').disabled=!authenticated||saving}
- function setSession(value){token=value;authenticated=!!value;try{if(value)sessionStorage.setItem('medical-firebase-admin-session-v1',value);else sessionStorage.removeItem('medical-firebase-admin-session-v1')}catch{}authUI()}
+ function authUI(){byId('version-edit').hidden=!OFFICIAL_SITE||!authenticated||!record||editing;byId('admin-login').setAttribute('aria-label',authenticated?'管理者帳號':'管理者登入');byId('admin-login').title=authenticated?'管理者帳號':'管理者登入';byId('admin-login').querySelector('.admin-indicator').hidden=!authenticated;byId('admin-form').hidden=authenticated;byId('admin-account').hidden=!authenticated;byId('admin-dialog-title').textContent=authenticated?'管理者帳號':'管理者登入';byId('version-save').disabled=!authenticated||saving}
+ function setSession(value){token=value;authenticated=!!value;try{if(value)sessionStorage.setItem('medical-firebase-admin-prod-session-v1',value);else sessionStorage.removeItem('medical-firebase-admin-prod-session-v1')}catch{}authUI()}
  async function request(path,options={}){
-  const publicRead=path==='/versions'&&(!options.method||options.method==='GET');
-  const api=STAGING_API||(publicRead?PUBLIC_API:'');
-  if(!api)throw new Error('預備環境後端尚未設定，管理登入及修改功能已安全停用。');
-  let res;try{res=await fetch(api+path,{...options,cache:'no-store',headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{}),...options.headers}})}catch{throw new Error('無法連線，請確認網路後再試。')}let data;try{data=await res.json()}catch{throw new Error('服務暫時無法使用，請稍後再試。')}if(!res.ok){if(res.status===401&&path!=='/auth/firebase')setSession('');throw new Error(data.error||'操作失敗，請稍後再試。')}return data}
+  if(path==='/versions'&&options.method==='PUT'&&!OFFICIAL_SITE)
+   throw new Error('候選版預覽禁止寫入正式版本紀錄。');
+  let res;try{res=await fetch(API+path,{...options,cache:'no-store',headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{}),...options.headers}})}catch{throw new Error('無法連線，請確認網路後再試。')}let data;try{data=await res.json()}catch{throw new Error('服務暫時無法使用，請稍後再試。')}if(!res.ok){if(res.status===401&&path!=='/auth/firebase')setSession('');throw new Error(data.error||'操作失敗，請稍後再試。')}return data}
  function draw(){if(!record)return;if(record.updatedAt)window.updateSiteDate?.(record.updatedAt);byId('version-content').textContent=record.content;byId('version-updated').textContent=record.updatedAt?'最後更新：'+new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(record.updatedAt)):'';authUI()}
  async function load(){if(editing)return;if(loading)return loading;byId('version-retry').hidden=true;status('載入中…');loading=(async()=>{try{record=await request('/versions');draw();status('')}catch(e){status(e.message);byId('version-retry').hidden=false}finally{loading=null}})();return loading}
  window.renderVersionHistory=load;
  byId('version-retry').addEventListener('click',load);
- byId('version-edit').addEventListener('click',()=>{if(!authenticated||!record)return;editing=true;byId('version-draft').value=record.content;byId('version-content').hidden=true;byId('version-form').hidden=false;status('');authUI();byId('version-draft').focus()});
+ byId('version-edit').addEventListener('click',()=>{if(!OFFICIAL_SITE||!authenticated||!record)return;editing=true;byId('version-draft').value=record.content;byId('version-content').hidden=true;byId('version-form').hidden=false;status('');authUI();byId('version-draft').focus()});
  function finishEdit(){editing=false;byId('version-form').hidden=true;byId('version-content').hidden=false;draw()}
  byId('version-cancel').addEventListener('click',()=>{finishEdit();status('已取消編輯。')});
- byId('version-form').addEventListener('submit',async event=>{event.preventDefault();if(saving||!authenticated)return;saving=true;authUI();byId('version-cancel').disabled=true;status('儲存中…');try{record=await request('/versions',{method:'PUT',body:JSON.stringify({content:byId('version-draft').value,revision:record.revision})});finishEdit();status('已儲存，所有訪客皆可查看更新。')}catch(e){status(e.message+' 草稿已保留。')}finally{saving=false;byId('version-cancel').disabled=false;authUI()}});
+ byId('version-form').addEventListener('submit',async event=>{event.preventDefault();if(saving||!authenticated||!OFFICIAL_SITE)return;saving=true;authUI();byId('version-cancel').disabled=true;status('儲存中…');try{record=await request('/versions',{method:'PUT',body:JSON.stringify({content:byId('version-draft').value,revision:record.revision})});finishEdit();status('已儲存，所有訪客皆可查看更新。')}catch(e){status(e.message+' 草稿已保留。')}finally{saving=false;byId('version-cancel').disabled=false;authUI()}});
 
  const googleButton=byId('admin-google-login');
  const authBridge=()=>window.firebaseAdminAuth;
  function syncGoogleButton(){
-  googleButton.disabled=!(authBridge()?.configured&&STAGING_API);
-  if(!STAGING_API)byId('admin-status').textContent='尚未設定隔離的預備後端網址。為避免操作正式資料，測試登入暫停開放。';
-  else if(!authBridge()?.configured)byId('admin-status').textContent='Google 登入尚未設定完成，請檢查 Firebase Web 設定。';
+  googleButton.disabled=!(authBridge()?.configured);
+  if(!authBridge()?.configured)byId('admin-status').textContent='Google 登入尚未設定完成，請檢查 Firebase Web 設定。';
   else if(/^(Google 登入尚未設定|尚未設定隔離的預備後端)/.test(byId('admin-status').textContent))byId('admin-status').textContent='';
  }
  window.addEventListener('firebase-admin-ready',syncGoogleButton);
@@ -49,7 +42,7 @@
  const close=()=>byId('admin-dialog').close();
  byId('admin-close').addEventListener('click',close);
  googleButton.addEventListener('click',async()=>{
-  if(googleButton.disabled||!STAGING_API||!authBridge()?.configured)return;
+  if(googleButton.disabled||!authBridge()?.configured)return;
   googleButton.disabled=true;
   byId('admin-status').textContent='正在驗證 Google 帳號…';
   try{
