@@ -9,7 +9,7 @@
  let token='',authenticated=false,record=null,editing=false,saving=false,loading=null;
  try{token=sessionStorage.getItem('medical-firebase-admin-prod-session-v1')||''}catch{}
  const status=message=>{byId('version-status').textContent=message};
- function authUI(){byId('version-edit').hidden=!OFFICIAL_SITE||!authenticated||!record||editing;byId('admin-login').setAttribute('aria-label',authenticated?'管理者帳號':'管理者登入');byId('admin-login').title=authenticated?'管理者帳號':'管理者登入';byId('admin-login').querySelector('.admin-indicator').hidden=!authenticated;byId('admin-form').hidden=authenticated;byId('admin-account').hidden=!authenticated;byId('admin-dialog-title').textContent=authenticated?'管理者帳號':'管理者登入';byId('version-save').disabled=!authenticated||saving}
+ function authUI(){byId('version-edit').hidden=!OFFICIAL_SITE||!authenticated||!record||editing;byId('admin-login').setAttribute('aria-label',authenticated?'管理者帳號':'管理者登入');byId('admin-login').title=authenticated?'管理者帳號':'管理者登入';byId('admin-login').querySelector('.admin-indicator').hidden=!authenticated;byId('admin-form').hidden=authenticated;byId('admin-account').hidden=!authenticated;byId('admin-dialog-title').textContent=authenticated?'管理者Eric已登入，歡迎~':'管理者登入';byId('version-save').disabled=!authenticated||saving}
  function setSession(value){token=value;authenticated=!!value;try{if(value)sessionStorage.setItem('medical-firebase-admin-prod-session-v1',value);else sessionStorage.removeItem('medical-firebase-admin-prod-session-v1')}catch{}authUI()}
  async function request(path,options={}){
   if(path==='/versions'&&options.method==='PUT'&&!OFFICIAL_SITE)
@@ -53,7 +53,7 @@
    if(typeof result.token!=='string'||!result.token)throw new Error('後端未回傳有效管理員 Session。');
    setSession(result.token);
    close();
-   if(location.hash==='#versions')status('已登入管理者。');
+   if(location.hash==='#versions')status('管理者Eric已登入，歡迎~');
   }catch(e){
    try{await authBridge()?.signOut()}catch{}
    byId('admin-status').textContent=e?.code==='auth/popup-closed-by-user'
