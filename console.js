@@ -12,32 +12,34 @@
 
  function drawDailyChart(data) {
   const target=$('console-daily-chart'), note=$('console-chart-note');
-  target.replaceChildren();note.textContent='';
-  const raw=[data.daily,data.dailyVisits,data.dailyCounts,data.dailyVisitors].find(Array.isArray);
-  const rows=(raw||[]).map(item=>{
-   if(!item||typeof item!=='object')return null;
-   const day=String(item.date??item.day??item.dayDate??'');
-   const amount=Number(item.count??item.visitors??item.visits??item.total);
-   return /^\d{4}-\d{2}-\d{2}$/.test(day)&&Number.isFinite(amount)&&amount>=0?{day,count:Math.floor(amount)}:null;
-  }).filter(Boolean).sort((a,b)=>a.day.localeCompare(b.day)).slice(-14);
-  if(!rows.length){
-   const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-   rows.push({day:today,count:Math.max(0,Number(data.today)||0)});
-   note.textContent='目前 API 僅提供今日、週、月總數；圖表先顯示今日實際數值。完整每日趨勢需後端提供每日歷史明細。';
-   $('console-chart-range').textContent='今日';
-  }else{$('console-chart-range').textContent=rows.length+' 日趨勢';}
-  const maximum=Math.max(1,...rows.map(x=>x.count));
-  const plot=document.createElement('div');plot.className='console-chart-bars';
-  for(const item of rows){
-   const column=document.createElement('div');column.className='console-chart-column';
-   const value=document.createElement('span');value.className='console-chart-value';value.textContent=item.count.toLocaleString('zh-TW');
-   const track=document.createElement('div');track.className='console-chart-track';
-   const bar=document.createElement('div');bar.className='console-chart-bar';bar.style.height=(item.count===0?0:Math.max(5,item.count/maximum*100))+'%';
-   const caption=document.createElement('span');caption.className='console-chart-day';caption.textContent=item.day.slice(5).replace('-','/');
-   column.title=item.day+'：'+item.count+' 人';track.append(bar);column.append(value,track,caption);plot.append(column);
+  target.replaceChildren();
+  const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const end=Date.parse(today+'T00:00:00Z');
+  const values=new Map();
+  for(const item of Array.isArray(data.daily)?data.daily:[]){
+   if(item&&/^\d{4}-\d{2}-\d{2}$/.test(item.date)&&typeof item.count==='number'&&Number.isInteger(item.count)&&item.count>=0)values.set(item.date,item.count);
   }
-  target.append(plot);
-  target.setAttribute('aria-label','每日瀏覽人數：'+rows.map(x=>x.day+' '+x.count+' 人').join('、'));
+  if(!Array.isArray(data.daily)&&typeof data.today==='number')values.set(today,data.today);
+  const rows=Array.from({length:7},(_,i)=>{const day=new Date(end-(6-i)*86400000).toISOString().slice(0,10);return {day,count:values.get(day)??null}});
+  $('console-chart-range').textContent='最近 7 日（含今日）';
+  note.textContent=rows.some(r=>r.count===null)?'無紀錄的日期顯示「—」，不視為 0 人；統計從追蹤功能啟用後開始累積。':'依臺灣日期統計，每日以瀏覽器識別去重。';
+  const ns='http://www.w3.org/2000/svg', svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','0 0 630 240');svg.style.width='100%';svg.style.height='auto';svg.setAttribute('class','console-line-chart');svg.setAttribute('role','img');
+  svg.setAttribute('aria-label','最近七日瀏覽人數：'+rows.map(r=>r.day+' '+(r.count===null?'無紀錄':r.count+' 人')).join('、'));
+  function el(tag,attrs,text){const n=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));if(text!==undefined)n.textContent=text;svg.append(n);return n}
+  const max=Math.max(1,...rows.map(r=>r.count??0)),x=i=>45+i*90,y=n=>180-n/max*140;
+  for(const n of [0,max]){el('line',{x1:40,x2:590,y1:y(n),y2:y(n),stroke:'#d7dece'});el('text',{x:34,y:y(n)+4,'text-anchor':'end','font-size':11,fill:'currentColor'},String(n))}
+  let previous=null;
+  rows.forEach((r,i)=>{
+   el('text',{x:x(i),y:218,'text-anchor':'middle','font-size':12,fill:'currentColor'},r.day.slice(5).replace('-','/'));
+   if(r.count===null){el('text',{x:x(i),y:174,'text-anchor':'middle',fill:'currentColor'},'—');previous=null;return}
+   const point={x:x(i),y:y(r.count)};
+   if(previous)el('line',{x1:previous.x,y1:previous.y,x2:point.x,y2:point.y,stroke:'#34594d','stroke-width':3});
+   const dot=el('circle',{cx:point.x,cy:point.y,r:4,fill:'#34594d'});
+   const title=document.createElementNS(ns,'title');title.textContent=r.day+'：'+r.count+' 人';dot.append(title);
+   el('text',{x:point.x,y:point.y-12,'text-anchor':'middle','font-size':12,fill:'currentColor'},String(r.count));previous=point;
+  });
+  target.append(svg);
  }
  function updateAccess() {
   generation++; loading=false; clearPrivateData();$('console-refresh').disabled=false;$('console-more').disabled=false;
