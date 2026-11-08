@@ -201,6 +201,14 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
   count.textContent = '預覽不計數';
   return;
  }
+ // No client-side activation date; the Worker controls the statistics epoch.
+ try {
+  const meta=await window.medicalAnalyticsReady;
+  if(meta?.enabled){
+   const show=data=>{count.textContent=Number.isSafeInteger(data.total)?data.total.toLocaleString('zh-TW'):'暫時無法取得';unit.hidden=!Number.isSafeInteger(data.total)};
+   window.addEventListener('medical-analytics-total',e=>show(e.detail));show(window.medicalAnalyticsTotal||meta);return;
+  }
+ } catch {count.textContent='暫時無法取得';unit.hidden=true;return;}
  const key = 'medical-bookshelf:page-view:hits:v2';
  const cooldown = 5 * 60 * 1000;
  let storage;

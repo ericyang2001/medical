@@ -463,3 +463,8 @@ header .header-actions .console-link[hidden],#console-page[hidden],#console-page
 @media(prefers-reduced-transparency:reduce){#console-page .console-glass-refresh{background:#f8faf7;backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media(prefers-reduced-motion:reduce){#console-page .console-glass-refresh,#console-page .console-tabs a{transition:none}}
 @media(max-width:600px){.console-chart-panel{padding:16px 12px}.console-chart-bars{gap:6px}.console-chart-column{flex-basis:30px}.console-tabs a{flex:1 1 auto}}
+
+.console-period-date{color:var(--muted);font-size:13px;margin:0 0 16px;font-variant-numeric:tabular-nums}
+.console-metric{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-top:10px;flex-wrap:wrap}.console-metric>span{font-size:14px;white-space:nowrap}.console-cards .console-metric strong{font-size:26px;overflow-wrap:anywhere;min-width:0}
+.console-lifetime{margin-top:22px;padding:22px;border:1px solid #d7dece;border-radius:16px;background:#f5f6ee;text-align:center}.console-lifetime h2{font-size:18px}.console-lifetime strong{font-size:36px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.console-lifetime p{font-size:13px;color:var(--muted);margin-bottom:0}
+.console-chart-switch{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}#console-page .console-chart-switch button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
