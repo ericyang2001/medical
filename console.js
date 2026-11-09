@@ -12,7 +12,7 @@
  }
 
  function showTotal(data){
-  $('console-total').textContent=Number.isSafeInteger(data.total)?data.total.toLocaleString('zh-TW'):'—';
+  $('console-total').textContent=Number.isSafeInteger(data.total)&&data.total>=0?data.total.toLocaleString('zh-TW'):'暫時無法取得';
   $('console-total-start').textContent=data.startedAt?'自 '+new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(data.startedAt))+' 起累加':'等待首筆有效瀏覽';
  }
  function showDates(now){
@@ -38,20 +38,24 @@
   for(const mode of ['views','visitors'])$('console-chart-'+mode).setAttribute('aria-pressed',String(mode===chartMode));
   note.textContent=rows.some(r=>r.count===null)?'— 表示無資料。':'';if(chartMode==='views'&&data.dailyMetrics?.some(r=>r.viewsPartial))note.textContent+=' 啟用當日僅含啟用後的人次。';
   const ns='http://www.w3.org/2000/svg', svg=document.createElementNS(ns,'svg');
-  svg.setAttribute('viewBox','0 0 630 240');svg.style.width='100%';svg.style.height='auto';svg.setAttribute('class','console-line-chart');svg.setAttribute('role','img');
+  const mobile=window.matchMedia?.('(max-width:600px)').matches===true, width=mobile?Math.max(240,target.clientWidth||300):630;
+  svg.setAttribute('viewBox',`0 0 ${width} 240`);svg.style.width='100%';svg.style.height='auto';svg.setAttribute('class','console-line-chart');svg.setAttribute('role','img');
   svg.setAttribute('aria-label',(chartMode==='views'?'最近七日瀏覽人次：':'最近七日瀏覽人數：')+rows.map(r=>r.day+' '+(r.count===null?'無紀錄':r.count+(chartMode==='views'?' 次':' 人'))).join('、'));
   function el(tag,attrs,text){const n=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));if(text!==undefined)n.textContent=text;svg.append(n);return n}
-  const max=Math.max(1,...rows.map(r=>r.count??0)),x=i=>45+i*90,y=n=>180-n/max*140;
-  for(const n of [0,max]){el('line',{x1:40,x2:590,y1:y(n),y2:y(n),stroke:'#d7dece'});el('text',{x:34,y:y(n)+4,'text-anchor':'end','font-size':11,fill:'currentColor'},String(n))}
+  const max=Math.max(1,...rows.map(r=>r.count??0));
+  const label=n=>mobile?new Intl.NumberFormat('zh-TW',{notation:'compact',maximumFractionDigits:1}).format(n):String(n);
+  const left=mobile?Math.max(40,label(max).length*13+8):45, right=mobile?width-20:585;
+  const x=i=>left+i*(right-left)/6,y=n=>180-n/max*(mobile?125:140);
+  for(const n of [0,max]){el('line',{x1:left-5,x2:mobile?right+5:590,y1:y(n),y2:y(n),stroke:'#d7dece'});el('text',{x:left-11,y:y(n)+4,'text-anchor':'end','font-size':mobile?13:11,fill:'currentColor'},label(n))}
   let previous=null;
   rows.forEach((r,i)=>{
-   el('text',{x:x(i),y:218,'text-anchor':'middle','font-size':12,fill:'currentColor'},r.day.slice(5).replace('-','/'));
+   if(!mobile||i%2===0)el('text',{x:x(i),y:218,'text-anchor':'middle','font-size':mobile?13:12,fill:'currentColor'},r.day.slice(5).replace('-','/'));
    if(r.count===null){el('text',{x:x(i),y:174,'text-anchor':'middle',fill:'currentColor'},'—');previous=null;return}
    const point={x:x(i),y:y(r.count)};
    if(previous)el('line',{x1:previous.x,y1:previous.y,x2:point.x,y2:point.y,stroke:'#34594d','stroke-width':3});
    const dot=el('circle',{cx:point.x,cy:point.y,r:4,fill:'#34594d'});
    const title=document.createElementNS(ns,'title');title.textContent=r.day+'：'+r.count+(chartMode==='views'?' 次':' 人');dot.append(title);
-   el('text',{x:point.x,y:point.y-12,'text-anchor':'middle','font-size':12,fill:'currentColor'},String(r.count));previous=point;
+   el('text',{x:point.x,y:point.y-(mobile&&i%2?32:12),'text-anchor':mobile&&i===0?'start':mobile&&i===6?'end':'middle','font-size':12,fill:'currentColor'},label(r.count));previous=point;
   });
   target.append(svg);
  }
@@ -74,7 +78,9 @@
    if(current!==generation||!window.medicalConsoleAccess.authenticated())return;
    if(selected==='overview'){
     for(const [id,key] of [['console-today','today'],['console-week','week'],['console-month','month']])$(id).textContent=Number(data[key]||0).toLocaleString('zh-TW');
-    chartData=data;serverOffset=(Number(data.serverNow)||Date.now())-Date.now();showDates(Date.now()+serverOffset);showTotal(data);
+    chartData=data;serverOffset=(Number(data.serverNow)||Date.now())-Date.now();showDates(Date.now()+serverOffset);
+    if(data.enabled===true&&window.medicalPublishAnalyticsTotal)showTotal(window.medicalPublishAnalyticsTotal(data));
+    else showTotal(window.medicalAnalyticsTotal||data);
     for(const [key,kind] of [['today','day'],['week','week'],['month','month']]){const v=data.periods?.[kind]?.views;$('console-views-'+key).textContent=Number.isSafeInteger(v)?v.toLocaleString('zh-TW'):'—';$('console-views-'+key).title=data.periods?.[kind]?.viewsPartial?'此期間僅含新統計啟用後的人次':''}
     drawDailyChart(data);
    }else{
@@ -105,6 +111,8 @@
  window.addEventListener('medical-admin-state',updateAccess);
  for(const mode of ['views','visitors'])$('console-chart-'+mode).addEventListener('click',()=>{chartMode=mode;if(chartData)drawDailyChart(chartData)});
  window.addEventListener('medical-analytics-total',e=>{if(window.medicalConsoleAccess?.authenticated())showTotal(e.detail)});
+ window.addEventListener('medical-analytics-error',()=>{if(window.medicalConsoleAccess?.authenticated())$('console-total').textContent='暫時無法取得'});
+ window.addEventListener('resize',()=>{if(chartData)drawDailyChart(chartData)});
  function rollover(){if(!document.hidden&&page==='overview'&&location.hash.startsWith('#console')&&window.medicalConsoleAccess?.authenticated()&&new Date(Date.now()+serverOffset+8*3600000).toISOString().slice(0,10)!==renderedDay)load()}
  document.addEventListener('visibilitychange',rollover);setInterval(rollover,60000);
 })();

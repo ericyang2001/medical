@@ -201,14 +201,16 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
   count.textContent = '預覽不計數';
   return;
  }
+ // Subscribe before the initial request so recovery and later console updates work too.
+ const show=data=>{if(data?.enabled!==true)return;count.textContent=Number.isSafeInteger(data.total)&&data.total>=0?data.total.toLocaleString('zh-TW'):'暫時無法取得';unit.hidden=!Number.isSafeInteger(data.total)||data.total<0};
+ const unavailable=()=>{count.textContent='暫時無法取得';unit.hidden=true};
+ window.addEventListener('medical-analytics-total',e=>show(e.detail));
+ window.addEventListener('medical-analytics-error',unavailable);
  // No client-side activation date; the Worker controls the statistics epoch.
  try {
   const meta=await window.medicalAnalyticsReady;
-  if(meta?.enabled){
-   const show=data=>{count.textContent=Number.isSafeInteger(data.total)?data.total.toLocaleString('zh-TW'):'暫時無法取得';unit.hidden=!Number.isSafeInteger(data.total)};
-   window.addEventListener('medical-analytics-total',e=>show(e.detail));show(window.medicalAnalyticsTotal||meta);return;
-  }
- } catch {count.textContent='暫時無法取得';unit.hidden=true;return;}
+  if(meta?.enabled){show(window.medicalAnalyticsTotal||meta);return;}
+ } catch {unavailable();return;}
  const key = 'medical-bookshelf:page-view:hits:v2';
  const cooldown = 5 * 60 * 1000;
  let storage;
@@ -258,7 +260,7 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
   let finished = false;
   const timeout = setTimeout(fail, 20000);
   function fail() {
-   if (finished) return;
+   if (finished || window.medicalAnalyticsTotal?.enabled) return;
    finished = true;
    clearTimeout(timeout);
    badge.onload = badge.onerror = null;
@@ -278,7 +280,7 @@ document.getElementById("refresh-page")?.addEventListener("click", () => window.
    }
   }
   badge.onload = () => {
-   if (finished) return;
+   if (finished || window.medicalAnalyticsTotal?.enabled) return;
    finished = true;
    clearTimeout(timeout);
    count.replaceChildren(badge);

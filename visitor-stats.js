@@ -26,9 +26,59 @@
 (() => {
  const base='https://medical-auth-v2-prod.eric20011230.workers.dev/api';
  const official=location.origin==='https://ericyang2001.github.io';
- const emit=data=>{window.medicalAnalyticsTotal=data;window.dispatchEvent(new CustomEvent('medical-analytics-total',{detail:data}));return data};
- window.medicalAnalyticsReady=official?fetch(base+'/analytics/total',{cache:'no-store',credentials:'omit'}).then(async r=>{if(!r.ok)throw Error('統計暫時無法取得');return emit(await r.json())}):Promise.resolve({enabled:false});
+ // One in-memory public snapshot for footer, console and other open tabs.
+ // Never persist totals as an authoritative counter, and never POST during refresh.
+ let snapshot=null,revision=0,refreshing=null,channel=null;
+ const valid=data=>data?.enabled===true&&Number.isSafeInteger(data.total)&&data.total>=0;
+ const notify=()=>window.dispatchEvent(new CustomEvent('medical-analytics-total',{detail:snapshot}));
+ function publish(data,broadcast=true){
+  if(!valid(data))throw Error('統計暫時無法取得');
+  const next={enabled:true,total:data.total,startedAt:data.startedAt??null,epochId:data.epochId??null,serverNow:Number(data.serverNow)||0};
+  if(snapshot){
+   if(snapshot.epochId!==null&&next.epochId===null){notify();return snapshot;}
+   const sameEpoch=next.epochId===snapshot.epochId&&next.startedAt===snapshot.startedAt;
+   // Within one epoch totals cannot fall, even if request start times race with writes.
+   if(sameEpoch?next.total<snapshot.total||next.total===snapshot.total&&next.serverNow<snapshot.serverNow:next.serverNow<snapshot.serverNow){notify();return snapshot;}
+   if(sameEpoch)next.serverNow=Math.max(next.serverNow,snapshot.serverNow);
+  }
+  snapshot=next;revision++;window.medicalAnalyticsTotal=snapshot;notify();
+  if(broadcast)try{channel?.postMessage(snapshot)}catch{}
+  return snapshot;
+ }
+ window.medicalPublishAnalyticsTotal=publish;
+ async function refresh(){
+  if(refreshing)return refreshing;
+  const before=revision,controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);
+  refreshing=(async()=>{
+   try{
+    const r=await fetch(base+'/analytics/total',{cache:'no-store',credentials:'omit',signal:controller.signal});
+    if(!r.ok)throw Error('統計暫時無法取得');
+    const data=await r.json();
+    if(data.enabled===false&&!snapshot)return data;
+    return publish(data);
+   }catch(error){
+    // A failed older GET must not hide a more recent successful update.
+    if(revision===before)window.dispatchEvent(new Event('medical-analytics-error'));
+    throw error;
+   }finally{clearTimeout(timeout);refreshing=null;}
+  })();
+  return refreshing;
+ }
+ window.medicalRefreshAnalyticsTotal=refresh;
+ if(official&&typeof BroadcastChannel==='function')try{
+  channel=new BroadcastChannel('medical-analytics-total-v2');
+  channel.onmessage=e=>{if(valid(e.data))publish(e.data,false)};
+ }catch{}
+ window.medicalAnalyticsReady=official?refresh():Promise.resolve({enabled:false});
  window.medicalAnalyticsReady.catch(()=>{});
+ const refreshVisible=()=>{if(official&&!document.hidden)refresh().catch(()=>{})};
+ if(official){
+  window.addEventListener('focus',refreshVisible);
+  window.addEventListener('pageshow',e=>{if(e.persisted)refreshVisible()});
+  document.addEventListener('visibilitychange',refreshVisible);
+  // Also catches other devices, or browsers without BroadcastChannel support.
+  setInterval(refreshVisible,60000);
+ }
  if(!official)return;
  let busy=false,pending=null,retries=0;
  const queueKey='medical-analytics-pending-v2',cooldownKey='medical-analytics-last-attempt-v2';
@@ -36,7 +86,7 @@
   if(busy||!pending)return;busy=true;
   try{
    const r=await fetch(base+'/analytics/views',{method:'POST',credentials:'omit',redirect:'error',headers:{'Content-Type':'application/json'},body:JSON.stringify(pending)});
-   if(r.ok){emit(await r.json());pending=null;try{sessionStorage.removeItem(queueKey)}catch{}}
+   if(r.ok){publish(await r.json());pending=null;try{sessionStorage.removeItem(queueKey)}catch{}}
    else if(r.status===409||r.status===400){pending=null;try{sessionStorage.removeItem(queueKey)}catch{}}
    else throw Error('retry');
   }catch{if(retries++<3)setTimeout(send,Math.min(30000,1000*2**retries))}finally{busy=false}
